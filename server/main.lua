@@ -76,8 +76,12 @@ RegisterServerEvent('don-jewellery:server:ToggleDoorlocks', function(store, lock
     if Config.DoorLock == 'qb' then
       TriggerClientEvent('qb-doorlock:client:setState', -1, src, Config.Stores[store]['Doors'].main, locked, src, false, false)
     elseif Config.DoorLock == 'ox' then
-      local door = exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[store]['Doors'].main)
-      TriggerEvent('ox_doorlock:setState', door.id, locked)
+      local success, door = pcall(function()
+        return exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[store]['Doors'].main)
+      end)
+      if success and door then
+        TriggerEvent('ox_doorlock:setState', door.id, locked)
+      end
     elseif Config.DoorLock == 'cd' then
       TriggerClientEvent('cd_doorlock:SetDoorState_name', -1, locked, Config.Stores[store]['Doors'].main, 'Jewellery Stores')
     end
@@ -87,10 +91,18 @@ RegisterServerEvent('don-jewellery:server:ToggleDoorlocks', function(store, lock
         TriggerClientEvent('qb-doorlock:client:setState', -1, src, Config.Stores[i]['Doors'].main, locked, src, false, false)
         TriggerClientEvent('qb-doorlock:client:setState', -1, src, Config.Stores[i]['Doors'].sec, locked, src, false, false)
       elseif Config.DoorLock == 'ox' then
-        local main = exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[i]['Doors'].main)
-        local sec = exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[i]['Doors'].sec)
-        TriggerEvent('ox_doorlock:setState', main.id, locked)
-        TriggerEvent('ox_doorlock:setState', sec.id, locked)
+        local success1, main = pcall(function()
+          return exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[i]['Doors'].main)
+        end)
+        local success2, sec = pcall(function()
+          return exports['ox_doorlock']:getDoorFromName('jewellery_stores ' ..Config.Stores[i]['Doors'].sec)
+        end)
+        if success1 and main then
+          TriggerEvent('ox_doorlock:setState', main.id, locked)
+        end
+        if success2 and sec then
+          TriggerEvent('ox_doorlock:setState', sec.id, locked)
+        end
       elseif Config.DoorLock == 'cd' then
         TriggerClientEvent('cd_doorlock:SetDoorState_name', -1, locked, Config.Stores[i]['Doors'].main, 'Jewellery Stores')
         TriggerClientEvent('cd_doorlock:SetDoorState_name', -1, locked, Config.Stores[i]['Doors'].sec, 'Jewellery Stores')
