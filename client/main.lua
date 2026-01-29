@@ -1,5 +1,8 @@
 local RES_NAME <const> = bridge._RESOURCE
 local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases') --[[@module 'gr_jewellery.shared.jewellery_cases']]
+local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
+local start_case_models = {`des_jewel_cab_start`, `des_jewel_cab2_start`, `des_jewel_cab3_start`, `des_jewel_cab4_start`}
+local alarm = false
 local isLoggedIn = false
 
 local firstAlarm, secondAlarm, smashing, locked  = false, false, false, false
@@ -673,9 +676,80 @@ RegisterNetEvent('don-jewellery:client:StoreHit', function(storeIndex, isHit)
   end
 end)
 
+---@param coords vector3
+---@return string?, integer?, integer?
+local function get_closest_case(coords)
+  local closest_ent
+  local closest_coord
+  local dist = math.huge
+  for i = 1, #start_case_models do
+    local entity = GetClosestObjectOfType(coords.x, coords.y, coords.z, 1.0, start_case_models[i], false, true, false)
+    if entity ~= 0 then
+      local fnd_coords = GetEntityCoords(entity)
+      local fnd_dist = #(coords - fnd_coords)
+
+      if fnd_dist < dist then
+        closest_coord = fnd_coords
+        closest_ent = entity
+        dist = fnd_dist
+      end
+    end
+  end
+  for location, cases in pairs(JEWELLERY_CASES) do
+    for i = 1, #cases do
+      local case = cases[i]
+      if #(case.coords - closest_coord) <= 1.0 then return location, i, closest_ent end
+    end
+  end
+end
+
+local function smash_case(location, case, entity)
+  if not location or not case or not entity or not JEWELLERY_CASES[location][case] then -- exploit detected?
+    return
+  end
+  local dict = 'missheist_jewel'
+  if not glib.stream.animdict(dict) then return end
+  TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'busy', true)
+  local anim = 'smash_case'
+  local ped = PlayerPedId()
+  local case_data = JEWELLERY_CASES[location][case]
+  local coords = case_data.coords
+  local offset = GetAnimInitialOffsetPosition(dict, anim, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 2)
+  local heading = case_data.heading
+  offset = GetOffsetFromCoordAndHeadingInWorldCoords(offset.x, offset.y, offset.z, heading, 0.0, -0.25, 0.0)
+  local duration = GetAnimDuration(dict, anim)
+  local sequence = OpenSequenceTask()
+  ---@diagnostic disable-next-line: param-type-mismatch
+  TaskFollowNavMeshToCoord(0, offset.x, offset.y, offset.z, 1.0, 2500, 0.1, 512, heading)
+  TaskPlayAnimAdvanced(0, dict, anim, offset.x, offset.y, offset.z, 0.0, 0.0, heading, 1.0, 1.0, duration, 1090527232, 0.0)
+  CloseSequenceTask(sequence)
+  TaskPerformSequence(ped, sequence)
+  ClearSequenceTask(sequence)
+  CreateThread(function()
+    local ptfx = 'scr_jewelheist'
+    while GetEntityAnimCurrentTime(ped, dict, anim) <= 0.04 do
+      Wait(0)
+    end
+    TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'open', true)
+    glib.audio.playsoundatcoords(true, nil, 'Glass_Smash', offset, 0, 0, false)
+    if not glib.stream.ptfx(ptfx) then return end
+    UseParticleFxAsset(ptfx)
+    StartParticleFxNonLoopedOnEntity('scr_jewel_cab_smash', GetCurrentPedWeaponEntityIndex(ped), 0.0, 0.0, -0.1, 0.0, 0.0, 0.0, 1.0, false, false, false)
+    if not bridge.callback.await('jewellery:server:IsStoreHacked', false, location) then
+      if not alarm then
+        PrepareAlarm('JEWEL_STORE_HEIST_ALARMS')
+        StartAlarm('JEWEL_STORE_HEIST_ALARMS', false)
+        -- Alert Police Dispatch
+      end
+    end
+    RemoveAnimDict(dict)
+    RemoveNamedPtfxAsset(ptfx)
+  end)
+end
+
 -------------------------------- TARGET --------------------------------
 
-bridge.target.addmodel({'des_jewel_cab_start', 'des_jewel_cab2_start', 'des_jewel_cab3_start', 'des_jewel_cab4_start'}, {
+bridge.target.addmodel(start_case_models, {
   {
     name = 'jewel_heist',
     icon = 'fa fa-hand',
@@ -684,7 +758,7 @@ bridge.target.addmodel({'des_jewel_cab_start', 'des_jewel_cab2_start', 'des_jewe
       return not bridge.callback.await('jewellery:server:IsCaseBusy', false)
     end,
     onSelect = function()
-      print('Yay')
+      smash_case(get_closest_case(GetEntityCoords(PlayerPedId())))
     end,
     distance = 1.0
   }
