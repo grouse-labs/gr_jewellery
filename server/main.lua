@@ -4,6 +4,7 @@ local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases'
 local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
 local Cases = {}
 local Stores = {}
+local alarm = false
 
 local TimeOuts = {
   [1] = false,
@@ -47,6 +48,15 @@ local function is_case_busy(player)
     end
   end
   return true
+end
+
+local function is_store_hacked(player, location)
+  if not bridge.core.getplayer(player) then return end
+  if not Stores[location] then return end
+  local coords = GetEntityCoords(GetPlayerPed(player))
+  local store = Stores[location]
+  if #(store.coords - coords) > 25.0 then return end
+  return store.hacked
 end
 
 local function randomNum(min, max)
@@ -273,3 +283,5 @@ bridge.callback.register('jewellery:server:GetCaseStates', function(player)
 end)
 
 bridge.callback.register('jewellery:server:IsCaseBusy', is_case_busy)
+
+bridge.callback.register('jewellery:server:IsStoreHacked', is_store_hacked)
