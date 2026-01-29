@@ -1,8 +1,9 @@
 local RES_NAME <const> = bridge._RESOURCE
 local DEBUG_MODE <const> = bridge._DEBUG
 local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases') --[[@module 'gr_jewellery.shared.jewellery_cases']]
-
+local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
 local Cases = {}
+local Stores = {}
 
 local TimeOuts = {
   [1] = false,
@@ -21,6 +22,7 @@ local function init_script(resource)
   if resource ~= RES_NAME then return end
   for location, data in pairs(JEWELLERY_CASES) do
     Cases[location] = {}
+    Stores[location] = {coords = LOCATIONS.coords, hit = false, hacked = false}
     for i = 1, #data do
       local case = data[i]
       Cases[location][i] = {
