@@ -2,7 +2,6 @@ local RES_NAME <const> = bridge._RESOURCE
 local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases') --[[@module 'gr_jewellery.shared.jewellery_cases']]
 local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
 local start_case_models = {`des_jewel_cab_start`, `des_jewel_cab2_start`, `des_jewel_cab3_start`, `des_jewel_cab4_start`}
-local alarm = false
 local Zones = {}
 local isLoggedIn = false
 
@@ -317,6 +316,8 @@ else
 end
 AddEventHandler('onResourceStart', init_script)
 AddEventHandler('onResourceStop', deinit_script)
+
+RegisterNetEvent('jewellery:client:SetCaseState', set_case_state)
 
 -- AddEventHandler(bridge.core.getevent('load'), function()
 -- 	bridge.callback.trigger('don-jewellery:server:GetJewelleryState', false, function(result)
@@ -769,6 +770,83 @@ local function smash_case(location, case, entity)
   end)
 end
 
+local function use_thermite(location, coords, heading)
+  local chance = math.random(100)
+  if chance <= 10 then
+    -- Alert Police Dispatch: Suspcious Activity
+  end
+
+  local dict = 'anim@heists@ornate_bank@thermal_charge'
+  if not glib.stream.animdict(dict) then return end
+  local ped_anim = 'thermal_charge'
+  local bag_anim = 'bag_thermal_charge'
+  local ped = PlayerPedId()
+  local thermite = CreateObject(`hei_prop_heist_thermite`, coords.x, coords.y, coords.z + 0.2,  true,  true, false)
+  SetEntityCollision(thermite, false, true)
+  AttachEntityToEntity(thermite, ped, GetPedBoneIndex(ped, 28422), 0, 0, 0, 0, 0, 200.0, true, true, false, true, 1, true)
+
+  local scene = glib.netscene({
+    scene = {coords = coords, rotation = vector3(0.0, 0.0, heading), hold = true},
+    peds = {
+      {
+        dict = dict,
+        anim = ped_anim,
+        entity = ped,
+        -- blend_in = 1.5,
+        -- blend_out = -4.0,
+        scene_flags = 19480,
+        ragdoll_flags = 16
+      }
+    },
+    objs = {
+      {
+        dict = dict,
+        anim = bag_anim,
+        model = `hei_p_m_bag_var22_arm_s`,
+        -- blend_in = 4.0,
+        -- blend_out = -8.0,
+        scene_flags = 1
+      }
+    }
+  })
+  local ptfx = 'scr_ornate_heist'
+  local ptfx_handle = 0
+  local abort = false
+  scene:start(function(phase)
+    if phase >= 0.4 and IsEntityAttached(thermite) then
+      DetachEntity(thermite, true, true)
+      FreezeEntityPosition(thermite, true)
+      if not exports['glitch-minigames']:StartMemoryGame(
+        Config.ThermiteSettings.gridsize,
+        Config.ThermiteSettings.squareCount,
+        Config.ThermiteSettings.rounds,
+        Config.ThermiteSettings.showtime,
+        Config.ThermiteSettings.incorrectBlocks
+      ) then scene:clear(false, true); abort = true return end
+      Wait(500)
+      if not glib.stream.ptfx(ptfx) then return end
+      UseParticleFxAsset(ptfx)
+      ptfx_handle = StartParticleFxLoopedAtCoord('scr_heist_ornate_thermal_burn', coords.x, coords.y + 1.0, coords.z, 0.0, 0.0, 0.0, 1.0, false, false, false, false)
+    end
+  end)
+  if not abort then
+    bridge.callback.trigger('jewellery:server:IsStoreVulnerable', false, function(hacked, hit)
+      if not hacked then
+        -- Add time if statement to do alarms and dispatch
+        chance = math.random(100)
+        if chance >= 85 then return end
+        -- Alert Police Dispatch: Explosion
+      end
+    end, location)
+    Wait(3000)
+    scene:clear(false, true)
+    StopParticleFxLooped(ptfx_handle, false)
+    RemoveNamedPtfxAsset(ptfx)
+  end
+  DeleteObject(thermite)
+  RemoveAnimDict(dict)
+end
+
 -------------------------------- TARGET --------------------------------
 
 bridge.target.addmodel(start_case_models, {
@@ -809,6 +887,8 @@ for k, v in pairs(LOCATIONS) do
       end,
       onSelect = function()
         if not bridge.callback.await('jewellery:server:GetPolicePresence', false, k) then return end
+
+        use_thermite(k, thermite.coords, thermite.heading)
       end,
       distance = 1.0
     }
