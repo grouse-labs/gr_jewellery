@@ -1,33 +1,23 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'DonHulieo'
-description 'Jewellery Store Heist for QBCore'
+author 'Grouse Labs'
+description 'Grouse Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features'
 version '1.3.5'
+url 'https://github.com/grouse-labs/gr_jewellery'
 
 shared_scripts {
   '@gr_lib/init.lua',
   '@bridge/init.lua',
-  'locale/en.lua', 
-  'locale/*.lua', 
   'config.lua'
 }
 
-client_script {
-  'client/main.lua'
-}
+client_script 'client/main.lua'
 
-server_scripts {
-  '@oxmysql/lib/MySQL.lua', 
-  'server/main.lua'
-}
+server_script 'server/main.lua'
 
-dependencies {
-  'gr_lib',
-  'bridge',
-  'ox_lib',
-  'glitch-minigames',
-  'oxmysql'
-}
+files {'shared/*.lua', 'locales/*.lua'}
+
+dependencies {'/onesync', 'gr_lib', 'bridge', 'glitch-minigames'}
 
 lua54 'yes'
