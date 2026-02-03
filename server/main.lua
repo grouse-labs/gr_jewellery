@@ -2,9 +2,11 @@ local RES_NAME <const> = bridge._RESOURCE
 local DEBUG_MODE <const> = bridge._DEBUG
 local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases') --[[@module 'gr_jewellery.shared.jewellery_cases']]
 local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
+local CONFIG <const> = glib.require(RES_NAME..'.server.config') --[[@module 'gr_jewellery.server.config']]
 local Cases = {}
 local Stores = {}
 local PresenceCache = {}
+local Cooldowns = {}
 
 local TimeOuts = {
   [1] = false,
@@ -37,6 +39,7 @@ local function init_script(resource)
         open = false
       }
     end
+    Cooldowns[location] = {}
   end
   GlobalState['jewellery:alarm'] = false
   SetTimeout(2000, function()
@@ -62,7 +65,7 @@ end
 local function set_case_state(location, case, _type, state)
   local src = source
   if not bridge.core.getplayer(src) then return end
-  if not PresenceCache[src] then return end
+  if not PresenceCache[src] then return end -- Triggered without using target
   if not JEWELLERY_CASES[location][case] then return end
   if #(JEWELLERY_CASES[location][case].coords - GetEntityCoords(GetPlayerPed(src))) > 1.0 then return end
   Cases[location][case][_type] = state
@@ -74,10 +77,39 @@ end
 local function set_alarm_state(location, state)
   local src = source
   if not bridge.core.getplayer(src) then return end
-  if not PresenceCache[src] then return end
+  if not PresenceCache[src] then return end -- Triggered without using target
   if not LOCATIONS[location] then return end
   if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
   GlobalState['jewellery:alarm'] = state
+end
+
+---@param location string
+---@param _type string
+---@param state boolean
+local function set_store_state(location, _type, state)
+  local src = source
+  if not bridge.core.getplayer(src) then return end
+  if not PresenceCache[src] then return end -- Triggered without using target
+  if not LOCATIONS[location] then return end
+  if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
+  Stores[location][_type] = state
+  if _type == 'hit' then
+    local doors = LOCATIONS[location].doors
+    if not doors then return end
+    for i = 1, #doors do
+      local door = doors[i]
+      bridge.doorlock.setstate(src, door, not state)
+    end
+  elseif _type == 'hacked' then
+    for _, v in pairs(LOCATIONS) do
+      if v.doors then
+        for i = 1, #v.doors do
+          local door = v.doors[i]
+          bridge.doorlock.setstate(src, door, not state)
+        end
+      end
+    end
+  end
 end
 
 ---@param player string|integer
@@ -160,6 +192,7 @@ AddEventHandler('onResourceStart', init_script)
 AddEventHandler('onResourceStop', deinit_script)
 RegisterServerEvent('jewellery:server:SetCaseState', set_case_state)
 RegisterServerEvent('jewellery:server:VangelicoAlarm', set_alarm_state)
+RegisterServerEvent('jewellery:server:SetStoreState', set_store_state)
 
 RegisterServerEvent('don-jewellery:server:RemoveDoorItem', function()
   local src = source
