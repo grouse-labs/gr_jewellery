@@ -721,7 +721,7 @@ local function smash_case(location, case, entity)
   local sequence = OpenSequenceTask()
   ---@diagnostic disable-next-line: param-type-mismatch
   TaskFollowNavMeshToCoord(0, offset.x, offset.y, offset.z, 1.0, 2500, 0.1, 512, heading)
-  TaskPlayAnimAdvanced(0, dict, anim, offset.x, offset.y, offset.z, 0.0, 0.0, heading, 1.0, 1.0, duration, 1090527232, 0.0)
+  TaskPlayAnimAdvanced(0, dict, anim, offset.x, offset.y, offset.z, 0.0, 0.0, heading, 1.0, 1.0, duration, 1090527232 --[[+ 4194304 Adds Collision on Impact]], 0.0)
   CloseSequenceTask(sequence)
   TaskPerformSequence(ped, sequence)
   ClearSequenceTask(sequence)
@@ -735,13 +735,19 @@ local function smash_case(location, case, entity)
     if not glib.stream.ptfx(ptfx) then return end
     UseParticleFxAsset(ptfx)
     StartParticleFxNonLoopedOnEntity('scr_jewel_cab_smash', GetCurrentPedWeaponEntityIndex(ped), 0.0, 0.0, -0.1, 0.0, 0.0, 0.0, 1.0, false, false, false)
-    if not bridge.callback.await('jewellery:server:IsStoreHacked', false, location) then
-      if not alarm then
-        PrepareAlarm('JEWEL_STORE_HEIST_ALARMS')
-        StartAlarm('JEWEL_STORE_HEIST_ALARMS', false)
+    bridge.callback.trigger('jewellery:server:IsStoreVulnerable', false, function(hacked, hit)
+      if not hacked and not GlobalState['jewellery:alarm'] then
+        -- Add time if statement to do alarms and dispatch
+        if location == 'main' then
+          PrepareAlarm('JEWEL_STORE_HEIST_ALARMS')
+          StartAlarm('JEWEL_STORE_HEIST_ALARMS', false)
+          TriggerServerEvent('jewellery:server:VangelicoAlarm', location, true)
+        end
+        local chance = math.random(100)
+        if hit and chance >= 70 then return end
         -- Alert Police Dispatch
       end
-    end
+    end, location)
     RemoveAnimDict(dict)
     RemoveNamedPtfxAsset(ptfx)
   end)
