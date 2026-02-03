@@ -23,7 +23,12 @@ local function init_script(resource)
   if resource ~= RES_NAME then return end
   for location, data in pairs(JEWELLERY_CASES) do
     Cases[location] = {}
-    Stores[location] = {coords = LOCATIONS.coords, hit = false, hacked = false}
+    Stores[location] = {
+      coords = LOCATIONS[location] and LOCATIONS[location].coords,
+      police = LOCATIONS[location] and LOCATIONS[location].police,
+      hit = false,
+      hacked = false
+    }
     for i = 1, #data do
       local case = data[i]
       Cases[location][i] = {
@@ -36,6 +41,7 @@ local function init_script(resource)
 end
 
 ---@param player string|integer
+---@return boolean?
 local function is_case_busy(player)
   if not bridge.core.getplayer(player) then return end
   local coords = GetEntityCoords(GetPlayerPed(player))
@@ -51,12 +57,16 @@ local function is_case_busy(player)
 end
 
 local function is_store_hacked(player, location)
+---@param player string|integer
+---@param location string
+---@return boolean?, boolean?
+local function is_store_vulnerable(player, location)
   if not bridge.core.getplayer(player) then return end
   if not Stores[location] then return end
   local coords = GetEntityCoords(GetPlayerPed(player))
   local store = Stores[location]
-  if #(store.coords - coords) > 25.0 then return end
-  return store.hacked
+  if #(store.coords - coords) > 100.0 then return end
+  return store.hacked, store.hit
 end
 
 local function randomNum(min, max)
@@ -88,15 +98,9 @@ end
 -------------------------------- EVENTS --------------------------------
 
 AddEventHandler('onResourceStart', init_script)
-
-RegisterServerEvent('jewellery:server:SetCaseState', function(location, case, _type, state)
-  local src = source
-  if not bridge.core.getplayer(src) then return end
-  if not JEWELLERY_CASES[location][case] then return end
-  if #(JEWELLERY_CASES[location][case].coords - GetEntityCoords(GetPlayerPed(src))) > 1.0 then return end
-  Cases[location][case][_type] = state
-  if _type ~= 'busy' then TriggerClientEvent('jewellery:client:SetCaseState', -1, location, case, state) end
-end)
+AddEventHandler('onResourceStop', deinit_script)
+RegisterServerEvent('jewellery:server:SetCaseState', set_case_state)
+RegisterServerEvent('jewellery:server:VangelicoAlarm', set_alarm_state)
 
 RegisterServerEvent('don-jewellery:server:RemoveDoorItem', function()
   local src = source
@@ -284,4 +288,4 @@ end)
 
 bridge.callback.register('jewellery:server:IsCaseBusy', is_case_busy)
 
-bridge.callback.register('jewellery:server:IsStoreHacked', is_store_hacked)
+bridge.callback.register('jewellery:server:IsStoreVulnerable', is_store_vulnerable)
