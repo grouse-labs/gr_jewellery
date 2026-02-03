@@ -297,6 +297,8 @@ end
 local function deinit_script(resource)
   if resource and type(resource) == 'string' and resource ~= RES_NAME then return end
   RemoveAnimDict('missheist_jewel')
+  RemoveAnimDict('anim@heists@ornate_bank@thermal_charge')
+  RemoveAnimDict('amb@world_human_seat_wall_tablet@female@base')
   RemoveNamedPtfxAsset('scr_jewelheist')
   RemoveNamedPtfxAsset('scr_ornate_heist')
   StopAlarm('JEWEL_STORE_HEIST_ALARMS', true)
@@ -748,6 +750,7 @@ local function smash_case(location, case, entity)
       Wait(0)
     end
     TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'open', true)
+    ---@diagnostic disable-next-line: param-type-mismatch
     glib.audio.playsoundatcoords(true, nil, 'Glass_Smash', offset, 0, 0, false)
     if not glib.stream.ptfx(ptfx) then return end
     UseParticleFxAsset(ptfx)
@@ -834,9 +837,12 @@ local function use_thermite(location, coords, heading)
       if not hacked then
         -- Add time if statement to do alarms and dispatch
         chance = math.random(100)
-        if chance >= 85 then return end
-        -- Alert Police Dispatch: Explosion
+        if chance < 85 then
+          -- Alert Police Dispatch: Explosion
+        end
       end
+      if hit then return end
+      -- Set Store as Hit
     end, location)
     Wait(3000)
     scene:clear(false, true)
@@ -844,6 +850,29 @@ local function use_thermite(location, coords, heading)
     RemoveNamedPtfxAsset(ptfx)
   end
   DeleteObject(thermite)
+  RemoveAnimDict(dict)
+end
+
+local function hack_security(location)
+  local dict = 'amb@world_human_seat_wall_tablet@female@base'
+  if not glib.stream.animdict(dict) then return end
+  local ped = PlayerPedId()
+  local tablet = CreateObject(`prop_cs_tablet`, 0, 0, 0, true, true, false)
+
+  AttachEntityToEntity(tablet, ped, GetPedBoneIndex(ped, 57005), 0.17, 0.10, -0.13, 20.0, 180.0, 180.0, true, true, false, true, 1, true)
+  TaskPlayAnim(ped, dict, 'base', 8.0, -8.0, -1, 50, 1.0, false, false, false)
+  Wait(1000)
+
+  if not exports['glitch-minigames']:StartPipePressureGame(Config.VarHackSettings.gridsize, Config.VarHackSettings.time) then
+    bridge.notify.text(Lang:t('error.fail_hack'), 'error')
+  else
+    bridge.callback.trigger('jewellery:server:IsStoreVulnerable', false, function(hacked, hit)
+      if hacked then return end
+      -- Set Store as Hacked
+    end, location)
+  end
+  StopAnimTask(ped, dict, 'base', 8.0)
+  DeleteObject(tablet)
   RemoveAnimDict(dict)
 end
 
@@ -905,130 +934,21 @@ for k, v in pairs(LOCATIONS) do
         name = 'jewelpc1',
         icon = 'fas fa-bug',
         label = 'Hack Security System',
-        item = Config.HackItem,
-        distance = 2.5,
+        item = 'phone',
+        canInteract = function()
+          local hacked = bridge.callback.await('jewellery:server:IsStoreVulnerable', false, k)
+          return isLoggedIn and not hacked
+        end,
         onSelect = function()
-          TriggerEvent('don-jewellery:client:HackSecurity')
-        end
+          if not bridge.callback.await('jewellery:server:GetPolicePresence', false, k) then return end
+
+          hack_security(k)
+        end,
+        distance = 1.0,
       }
     })
   end
 end
-
--- if not Config.OneStore then
-  -- for k, v in pairs(Config.Vitrines) do
-  --   bridge.target.addboxzone({
-  --     center = v.coords,
-  --     size = vector3(1, 1, 2),
-  --     heading = 40,
-  --     debug = false
-  --   }, {
-  --     {
-  --       name = 'jewelstore' .. k,
-  --       icon = 'fa fa-hand',
-  --       label = Lang:t('general.target_label'),
-  --       distance = 1.5,
-  --       onSelect = function()
-  --         if validWeapon() then
-  --           TriggerEvent('don-jewellery:client:SmashCase', k)
-  --         else
-  --           bridge.notify.text(Lang:t('error.wrong_weapon'), 'error')
-  --         end
-  --       end,
-  --       canInteract = function()
-  --         if v.isOpened or v.isBusy then return false end
-  --         return true
-  --       end,
-  --     }
-  --   })
-  -- end
---   for k, v in pairs(Config.Stores) do
---     bridge.target.addboxzone({
---       center = v['Thermite'].coords,
---       size = vector3(0.4, 0.8, v['Thermite'].maxZ - v['Thermite'].minZ),
---       heading = v['Thermite'].h,
---       debug = false
---     }, {
---       {
---         name = 'jewelthermite' .. k,
---         icon = 'fas fa-bug',
---         label = 'Blow Fuse Box',
---         item = 'thermite',
---         distance = 2.5,
---         onSelect = function()
---           TriggerEvent('don-jewellery:client:Thermite', k)
---         end
---       }
---     })
---   end
--- else
-  -- for i = 1, 20, 1 do
-  --   bridge.target.addboxzone({
-  --     center = Config.Vitrines[i].coords,
-  --     size = vector3(1, 1, 2),
-  --     heading = 40,
-  --     debug = false
-  --   }, {
-  --     {
-  --       name = 'jewelstore' .. i,
-  --       icon = 'fa fa-hand',
-  --       label = Lang:t('general.target_label'),
-  --       distance = 1.5,
-  --       onSelect = function()
-  --         local ped = PlayerPedId()
-  --         if GetSelectedPedWeapon(ped) == `WEAPON_UNARMED` then
-  --           bridge.notify.text(Lang:t('error.unarmed'), 'error')
-  --         else
-  --           if validWeapon() then
-  --             TriggerEvent('don-jewellery:client:SmashCase', i)
-  --           else
-  --             bridge.notify.text(Lang:t('error.wrong_weapon'), 'error')
-  --           end
-  --         end
-  --       end,
-  --       canInteract = function()
-  --         if Config.Vitrines[i].isOpened or Config.Vitrines[i].isBusy then return false end
-  --         return true
-  --       end,
-  --     }
-  --   })
-  -- end
---   bridge.target.addboxzone({
---     center = Config.Stores[1]['Thermite'].coords,
---     size = vector3(0.4, 0.8, Config.Stores[1]['Thermite'].maxZ - Config.Stores[1]['Thermite'].minZ),
---     heading = Config.Stores[1]['Thermite'].h,
---     debug = false
---   }, {
---     {
---       name = 'jewelthermite1',
---       icon = 'fas fa-bug',
---       label = 'Blow Fuse Box',
---       item = Config.DoorItem,
---       distance = 2.5,
---       onSelect = function()
---         TriggerEvent('don-jewellery:client:Thermite', 1)
---       end
---     }
---   })
--- end
-
--- bridge.target.addboxzone({
---   center = Config.Stores[1]['Hack'].coords,
---   size = vector3(0.4, 0.6, Config.Stores[1]['Hack'].maxZ - Config.Stores[1]['Hack'].minZ),
---   heading = Config.Stores[1]['Hack'].h,
---   debug = false
--- }, {
---   {
---     name = 'jewelpc1',
---     icon = 'fas fa-bug',
---     label = 'Hack Security System',
---     item = Config.HackItem,
---     distance = 2.5,
---     onSelect = function()
---       TriggerEvent('don-jewellery:client:HackSecurity')
---     end
---   }
--- })
 
 -------------------------------- THREADS --------------------------------
 
