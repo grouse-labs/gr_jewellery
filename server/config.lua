@@ -1,9 +1,8 @@
 return {
   cooldowns = {
-    lock = 5,
-    cases = 5,
-    thermite = 5,
-    hack = 5
+    locks = 5,
+    cases = 10,
+    alarm = 5
   },
   autolock = false,
   hours = {
