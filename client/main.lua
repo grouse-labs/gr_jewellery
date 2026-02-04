@@ -43,45 +43,46 @@ local function createBlips()
   end
 end
 
-local function getCamID(k)
-  local camID = 0
-  if k <= 6 then
-    camID = 31
-  elseif k == 7 or k >= 18 and k <= 20 then
-    camID = 32
-  elseif k >= 12 and k <= 17 then
-    camID = 33
-  elseif k >= 8 and k <= 11 then
-    camID = 34
-  elseif k >= 21 and k <= 26 then
-    camID = 35
-  elseif k >= 27 and k <= 32 then
-    camID = 36
-  end
-  return camID
-end
+-- Legacy Code if I want to add this functionality back in future 😅
+-- local function getCamID(k)
+--   local camID = 0
+--   if k <= 6 then
+--     camID = 31
+--   elseif k == 7 or k >= 18 and k <= 20 then
+--     camID = 32
+--   elseif k >= 12 and k <= 17 then
+--     camID = 33
+--   elseif k >= 8 and k <= 11 then
+--     camID = 34
+--   elseif k >= 21 and k <= 26 then
+--     camID = 35
+--   elseif k >= 27 and k <= 32 then
+--     camID = 36
+--   end
+--   return camID
+-- end
 
-local function checkSkill(hack)
-  local retval = false
-  local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
-  local currXP = skill['Current']
-  local reqXP = Config.Skills[hack]['Limits'].xp
-  if currXP >= reqXP then
-    retval = true
-  end
-  return retval
-end
+-- local function checkSkill(hack)
+--   local retval = false
+--   local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
+--   local currXP = skill['Current']
+--   local reqXP = Config.Skills[hack]['Limits'].xp
+--   if currXP >= reqXP then
+--     retval = true
+--   end
+--   return retval
+-- end
 
-local function addSkillToPlayer(hack)
-  local reward = Config.Skills[hack]['Rewards'].xp
-  local multi = Config.Skills[hack]['Rewards'].multi
-  local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
-  local currXP = skill['Current']
-  if currXP <= 0 then currXP = 1 end
-  local xp = math.floor(reward * multi * (currXP * 0.001))
-  if xp < reward then xp = reward end
-  exports[Config.Skills.system]:UpdateSkill(Config.Skills[hack].skill, xp)
-end
+-- local function addSkillToPlayer(hack)
+--   local reward = Config.Skills[hack]['Rewards'].xp
+--   local multi = Config.Skills[hack]['Rewards'].multi
+--   local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
+--   local currXP = skill['Current']
+--   if currXP <= 0 then currXP = 1 end
+--   local xp = math.floor(reward * multi * (currXP * 0.001))
+--   if xp < reward then xp = reward end
+--   exports[Config.Skills.system]:UpdateSkill(Config.Skills[hack].skill, xp)
+-- end
 
 ---@param location string
 ---@param index integer
