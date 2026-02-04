@@ -226,7 +226,7 @@ local function get_police_presence(player, location)
   local amount = 0
   for i = 1, #players do
     local src = players[i]
-    if bridge.core.doesplayerhavegroup(src, 'leo') then
+    if bridge.core.doesplayerhavegroup(src, GetTypeJobs('leo')) then
       amount += 1
     end
   end

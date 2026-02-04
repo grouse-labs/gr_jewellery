@@ -21,6 +21,7 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
     - [Preview](#preview)
     - [Installation](#installation)
       - [Dependencies](#dependencies)
+        - [Glitch Minigames](#glitch-minigames)
         - [Grouse](#grouse)
         - [Frameworks](#frameworks)
         - [Inventories](#inventories)
@@ -55,6 +56,12 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 ### Installation
 
 #### Dependencies
+
+##### Glitch Minigames
+
+**This script requires the following script to be installed:**
+
+- [glitch_minigames](https://github.com/Gl1tchStudios/glitch-minigames/releases/tag/v2.0.0)
 
 ##### Grouse
 

@@ -348,7 +348,7 @@ local function hack_security(location)
   if not glib.stream.animdict(dict) then return end
   local ped = PlayerPedId()
   local tablet = CreateObject(`prop_cs_tablet`, 0, 0, 0, true, true, false)
-  local leo = bridge.core.doesplayerhavegroup('leo')
+  local leo = bridge.core.doesplayerhavegroup(GetTypeJobs('leo'))
 
   bridge.notify.text(translate('info.hacking_attempt'), 'primary', 2000)
   AttachEntityToEntity(tablet, ped, GetPedBoneIndex(ped, 57005), 0.17, 0.10, -0.13, 20.0, 180.0, 180.0, true, true, false, true, 1, true)
@@ -384,7 +384,7 @@ local function init_script(resource)
       name = 'jewel_heist',
       icon = 'fa fa-hand',
       label = translate('general.target_label'),
-      item = WEAPONS,
+      -- item = WEAPONS,
       canInteract = function()
         return isLoggedIn and not bridge.callback.await('jewellery:server:IsCaseBusy', false) and is_brandishing_weapon()
       end,
