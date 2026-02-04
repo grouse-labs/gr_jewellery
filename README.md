@@ -1,367 +1,339 @@
-# don-jewellery
+# gr_jewellery
 
-Jewellery Robbery for QBCore with 1 or 3 stores, Thermite, VarHack and auto-lock/unlock doors!
+Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features.
 
-## Credits
+## Features
 
-- [Holiday95](https://github.com/Holidayy95/qb-jewelery) For their fork of qb-jewellery which this is based on, and giving me the idea.
-- [QBCore Framework](https://github.com/qbcore-framework) For the orginal qb-jewellery and for inspiring me to code.
-- [MrNewb](https://github.com/MrNewb) For showing me how to get the cases to break, absolute legend!
+- Optimised code, resting at `0.00ms`, peaking at `0.01-0.02ms` whilst animating or changing locks.
+- 3 Stores preconfigured (using [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261)) by default!
+- Unique cooldowns for each case, the main store alarm and all store locks.
+- Serversided door control with auto-locking at preconfigured times.
+- Hacking the security system computer has *extra benefits*, LEO's by default can use it's `disable` feature.
+- Thermite the store fusebox to unlock the front doors!
+- Alarms & Alerts have different a chance to trigger depending on the time of day!
 
-## Dependencies
+## Table of Contents
 
-- [qb-core](https://github.com/qbcore-framework/qb-core)
-- [qb-target](https://github.com/qbcore-framework/qb-target)
-- [ps-ui](https://github.com/Project-Sloth/ps-ui)
+- [gr\_jewellery](#gr_jewellery)
+  - [Features](#features)
+  - [Table of Contents](#table-of-contents)
+    - [Credits](#credits)
+    - [Preview](#preview)
+    - [Installation](#installation)
+      - [Dependencies](#dependencies)
+        - [Grouse](#grouse)
+        - [Frameworks](#frameworks)
+        - [Inventories](#inventories)
+        - [Targetting](#targetting)
+        - [Doorlocks](#doorlocks)
+        - [Weather](#weather)
+      - [Initial Setup](#initial-setup)
+    - [Translations](#translations)
+    - [Store MLO's](#store-mlos)
+    - [Configuration](#configuration)
+      - [Creating Stores](#creating-stores)
+      - [Adding Cases](#adding-cases)
+      - [Server Config](#server-config)
+      - [Client Config](#client-config)
+      - [Doorlock Presets](#doorlock-presets)
+        - [qb-doorlock](#qb-doorlock)
+    - [Support](#support)
 
-### *Optional Dependancies*
+### Credits
 
-- [qb-policejob](https://github.com/qbcore-framework/qb-policejob)
-- [cd_dispatch](https://forum.cfx.re/t/paid-codesign-police-dispatch/2007097)
-- [ps-dispatch](https://github.com/Project-Sloth/ps-dispatch)
-- [qb-doorlock](https://github.com/qbcore-framework/qb-doorlock)
-- [ox_doorlock](https://github.com/overextended/ox_doorlock)
-- [cd_doorlock](https://forum.cfx.re/t/paid-codesign-door-lock/5005862)
-- [mz-skills](https://github.com/MrZainRP/mz-skills)
+- [Holiday95](https://github.com/Holidayy95/qb-jewelery)
+- [QBCore Framework](https://github.com/qbcore-framework)
+- [MrNewb](https://github.com/MrNewb)
 
-## New Features
-
-- (Not really a "new" feature but) Optimised script, running at 0~0.1ms, only hitting 0.1ms when it locks or unlocks a door after a hack.
-- 2 New stores to rob // Grapeseed & Paleto
-- Config option for just the base GTA Vangelico's Jewellers or all 3.
-- Config option for base qb police alerts or ps-dispatch.
-- Doors now lock depending of the time of day, and store is "unthievable" during opening hours.
-- Police alerts for thermite have a higher chance when closer to business close or open.
-- Police alerts for smashing the cases can be disabled by hacking the main Vangelico's PC.
-- Cases will actually smash after you hit them, and reset after cooldown.
-- Thermite the stores fusebox to open the front door at night.
-- Hack into Vinewood Vangelico's PC to unlock all Vangelico's for 5 minutes (or whatever you set the cooldown to).
-
-## Previews
+### Preview
 
 - [Don Jewellery](https://youtu.be/t-MO9yvzlx4)
 - [Cases](https://streamable.com/5xcg40)
 - [Dispatch Pt 1](https://streamable.com/3lspsx)
 - [Dispatch Pt 2](https://streamable.com/c9zs9z)
 
-## Translations
+### Installation
+
+#### Dependencies
+
+##### Grouse
+
+**This script requires the following scripts to be installed:**
+
+- [gr_lib](https://github.com/grouse-labs/gr_lib)
+- [bridge](https://github.com/grouse-labs/bridge)
+- [gr_blips](https://github.com/grouse-labs/gr_blips)
+
+##### Frameworks
+
+**Depending on your Framework, you will need one of the following dependencies:**
+
+- [qb-core](https://github.com/qbcore-framework/qb-core)
+- [es_extended](https://github.com/esx-framework/esx_core)
+- [qbx_core](https://github.com/Qbox-project/qbx_core)
+
+##### Inventories
+
+**Depending on your Inventory, you will need one of the following dependencies:**
+
+- [qb-inventory](https://github.com/qbcore-framework/qb-inventory)
+- [es_extended](https://github.com/esx-framework/esx_core)
+- [ox_inventory](https://github.com/overextended/ox_inventory)
+
+##### Targetting
+
+**Depending on your Targetting system, you will need one of the following dependencies:**
+
+- [ox_target](https://github.com/overextended/ox_target)
+- [qb-target](https://github.com/qbcore-framework/qb-target)
+
+##### Doorlocks
+
+**Depending on your Doorlock system, you will need one of the following dependencies:**
+
+- [ox_doorlock](https://github.com/overextended/ox_doorlock)
+- [qb-doorlock](https://github.com/qbcore-framework/qb-doorlock)
+
+##### Weather
+
+**Depending on your Weather system, you will need one of the following dependencies:**
+
+- [qb-weathersync](https://github.com/qbcore-framework/qb-weathersync)
+
+#### Initial Setup
+
+- Always use the reccomended FiveM artifacts, last tested on [23683](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/).
+- Download the latest version from [releases](https://github.com/grouse-labs/gr_jewellery/releases/latest).
+- Extract the contents of the zip file into your resources folder, into a folder which starts after your framework or;
+- Ensure the script in your `server.cfg` after your framework.
+
+### Translations
 
 - Please open an issue for translations, I'll add them in a following update.
 
-## Store MLO's
+### Store MLO's
 
-All store locations are for GigZ Jewelers' except for the base GTA one. It's a free map, link below:
+All store locations are for [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261)' except for the base GTA one. It's a free map, but **MAKE SURE TO INSTALL THE HEIST VERSION**.
 
-- [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261)
-- **MAKE SURE TO INSTALL THE HEIST VERSION**
-- If you're using these MLO's, place interiorproxies.meta in the gigz_jewel_free_heist folder and edit it's fxmanifest to the following:
+<!-- - If you're using these MLO's, place interiorproxies.meta in the gigz_jewel_free_heist folder and edit it's fxmanifest to the following:
 
 ```lua
 files {"interiorproxies.meta"}
     
 data_file 'INTERIOR_PROXY_ORDER_FILE' 'interiorproxies.meta'
-```
+``` -->
 
-- You'll also need to add the following code to qb-policejob/config.lua in Config.SecurityCameras after line 100 or after index 34 (Vangelico's Jewelers CAM#4);
+### Configuration
 
-```lua
-[35] = {label = "Vangelico's Grapeseed CAM#1", coords = vector3(1645.27, 4886.01, 44.7), r = {x = -35.0, y = 0.0, z = -141.82}, canRotate = true, isOnline = true},
-[36] = {label = "Vangelico's Paleto CAM#1", coords = vector3(-374.46, 6045.52, 34.05), r = {x = -35.0, y = 0.0, z = -105.09}, canRotate = true, isOnline = true},
-```
+#### Creating Stores
 
-- **It's important these cameras keep the same index as above and if you alter it, you should know what your doing.**
-
-### If you're using the config option for one store, and don't plan to use all three
-
-- Don't install the store MLO's or the gigz-jewel-fix to your server.
-- Don't add the door locks for Grapeseed or Paleto to the qb-doorlocks configs file.
-- Don't add the new Cam ID's to qb-policejob.
-- Set Config.OneStore = true.
-
-## Setup Logs
-
-Head over to qb-smallresources/server/logs.lua and add this underneath your last log
+- To create a new location, you need to add a table to the table in the [store_locations](shared\store_locations.lua) file.
 
 ```lua
-['donjewellery'] = '',
-```
-
-Once you've added that go over to your logs server and create a channel, create a webhook and then place it inbetween the ''.
-If you do not know how to create a webhook follow this guide [Creating Webhooks](https://www.youtube.com/watch?v=fKksxz2Gdnc).
-
-## Important Config
-
-### 1. Intial Setup
-
-#### 1.1. Store Times
-
-```lua
-Config.VangelicoHours = { -- Store Hours
-    range = {
-        open = 6, -- When the doors unlock
-        close = 18 -- When they lock for the night
-    },
-    alertnight = {
-        start = 18, -- The start of higher chance alerts in the evening
-        fin = 20 -- The end of higher chance alerts in the evening
-    },
-    alertmorn = {
-        start = 4, -- The start of higher chance alerts in the morning
-        fin = 6 -- The end of higher chance alerts in the morning
-    }
-}
-```
-
-- The range is the time the store is open, and the alert times are the times the police will have a higher chance of getting an alert.
-- By setting open and close to 0, the store will always be locked and robbable.
-
-#### 1.2. Variables
-
-```lua
-Config.OneStore = false -- Set to true if using just the main Vangelico's Jewellers
-Config.Cooldown = 5 * (60 * 2000) -- where x is minutes ie. x * (60 * 2000) \\ For door auto lock function
-Config.Timeout = 5 * (60 * 2000) -- where x is minutes ie. x * (60 * 2000) \\ For case smashing cooldown
-Config.AutoLock = true -- Set to false if you don't want the doors to auto lock/lock at all
-Config.RequiredCops = 3
-Config.Dispatch = 'ps' --[[ 'ps' for ps-dispatch, 'qb' for base qb-policejob alerts, 'cd' for cd_dispatch ]]--
-```
-
-- The cooldown is the time (in minutes) the doors will auto lock after a hack.
-- The timeout is the time (in minutes) the cases will reset after smashing.
-- If `Config.AutoLock` is set to false, the doors will always be unlocked.
-- The required cops is the amount of cops online required for the store to be "thievable".
-- Set `Config.Dispatch` to; 'ps' for ps-dispatch, 'qb' for base qb-policejob alerts, 'cd' for cd_dispatch.
-
-#### 1.3. Door Locks
-
-```lua
-
-Config.DoorLock = 'qb' --[[ Doorlock System ]]--
-
-Config.Stores = {
-  [1] = { -- City Vangelico's
-    label = 'Vangelico\'s Jewellers',
-    coords = vector3(-630.5, -237.13, 38.08),
-    ['Doors'] = {
-      main = 'jewellery-citymain',
-      sec = 'jewellery-citysec'
-    },
-    ...
+main = {
+  coords = vector3(-630.5, -237.13, 38.08),
+  doors = {'jewellery-citymain', 'jewellery-citysec'},
+  police = 0,
+  thermite = {
+    coords = vector3(-596.02, -283.7, 50.4),
+    heading = 300.0,
+    size = vector3(0.4, 0.8, 1.2)
   },
-  [2] = { -- Grapeseed Vangelico's
-    label = 'Vangelico\'s Jewellers',
-    coords = vector3(1649.78, 4882.32, 42.16),
-    ['Doors'] = {
-      main = 'jewellery-grapemain',
-      sec = 'jewellery-grapesec'
-    },
-    ...
-  },
-  [3] = { -- Paleto Vangelico's
-    label = 'Vangelico\'s Jewellers',
-    coords = vector3(-378.45, 6047.68, 32.69),
-    ['Doors'] = {
-      main = 'jewellery-palmain',
-      sec = 'jewellery-palsec'
-    },
-    ...
+  hack = {
+    coords = vector3(-631.04, -230.63, 38.06),
+    heading = 37.0,
+    size = vector3(0.4, 0.6, 1.0)
   }
 }
 ```
 
-- Set to `qb` for qb-doorlock  
-- // Create a file named `jewellery_stores` in qb-doorlock/config/ and copy the Door Config from the README into it.
+**Note:** Each location table is declared as a named table, and there must be a corresonding table in the [jewellery_cases](shared\jewellery_cases.lua) file.
 
-- Set to `ox` for ox_doorlock
-- // Uncomment '@ox_lib/init.lua' from the fxmanifest.lua, create a file named `jewellery_stores` in ox_doorlock/convert/ and copy the Door Config from the README into it.
+- `coords: vector3` - The coords for the store blip.
+- `doors: string[]` - The doors to the store, where index 1 is the main and index 2 is the secondary.
+- `police: integer` - How much police much be present to trigger the heist.
+- `thermite: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
+- `hack: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
 
-- Set to `cd` for cd_doorlock
-- // Create a Group named `Jewellery Stores` through the in-game menu and add the copy the Door Config from the README into it.
-- Ensure the names of the doors correspond to the names of the doors below.
-
-#### 1.5. Hacks
+#### Adding Cases
 
 ```lua
-Config.DoorItem = 'thermite' -- Item to remove\check for when placing a charge
-Config.ThermiteSettings = {
-  time = 60, -- time the hack displays for
-  gridsize = 5, -- (5, 6, 7, 8, 9, 10) size of grid by square units, ie. gridsize = 5 is a 5 * 5 (25) square grid
-  incorrectBlocks = 10 -- incorrectBlocks = number of incorrect blocks after which the game will fail
-}
-
-Config.HackItem = 'phone' -- Item to remove\check for when hacking
-Config.VarHackSettings = {
-  blocks = 2, -- time the hack displays for
-  time = 20 -- time the hack displays for
+main = {
+  {
+    coords = vector3(-627.21, -234.89, 37.65),
+    heading = 36.0,
+    start_prop = hash_case_start_3,
+    end_prop = hash_case_end_3
+  }
 }
 ```
 
-- The door item is the item you want to remove from the player when placing a charge.
-- The thermite settings are the settings for the thermite hack.
-- The hack item is the item you want to *check* for when hacking.
-- The var hack settings are the settings for the variable hack.
+- `coords: vector3` - The coords of the cabinet.
+- `heading: number`
+- `start_prop: integer`
+- `end_prop: integer`
 
-#### 1.6. Skills
+#### Server Config
 
 ```lua
-Config.Skills = {
-  enabled = false, -- Enable Skills
-  system = 'mz-skills', 
-  ['Thermite'] = {
-    skill = 'Heist Reputation', -- Skill to Use
-    ['Limits'] = {
-      xp = 800 -- XP Required to do the Task
+{
+  cooldowns = {
+    locks = 5,
+    cases = 10,
+    alarm = 5
+  },
+  autolock = true,
+  hours = {
+    open = 9,
+    close = 17
+  },
+  rewards = {
+    {item = 'rolex', amount = 1},
+    {item = 'diamond_ring', amount = {min = 1, max = 4}},
+    {item = 'goldchain', amount = {min = 1, max = 4}}
+  }
+}
+```
+
+- `cooldowns: {locks: integer, cases: integer, alarm: integer}` - Cooldown in minutes before reset.
+- `autolock: boolean` - Disable/enable the serverside time locked functionality.
+- `hours: {open: integer, close: integer}`- In 24 hour time.
+- `rewards: {item: string, amount: integer|{min: integer, max: integer}}`- Possible rewards and amounts for a successful case smashed.
+
+#### Client Config
+
+```lua
+{
+  minigames = {
+    thermite = {
+      size = 5,
+      squares = 4,
+      rounds = 3,
+      time = 3000,
+      attempts = 10
     },
-    ['Rewards'] = {
-      xp = 10, -- XP to give on success
-      multi = 1.5 -- Multiplier Based on Players Level
+    hack = {
+      size = 6,
+      time = 30000
     }
   },
-  ...
+  weapons = {
+    'weapon_assaultrifle',
+    'weapon_carbinerifle',
+    'weapon_pumpshotgun',
+    'weapon_sawnoffshotgun',
+    'weapon_compactrifle',
+    'weapon_autoshotgun',
+    'weapon_crowbar',
+    'weapon_pistol',
+    'weapon_pistol_mk2',
+    'weapon_combatpistol',
+    'weapon_appistol',
+    'weapon_pistol50',
+    'weapon_microsmg',
+  }
 }
 ```
 
-- Set `Config.Skills.enabled` to true to enable skills.
-- Set `Config.Skills.system` to the name of the skills system you are using.
-- Set `Config.Skills.[Task].skill` to the name of the skill you want to use.
-- Set `Config.Skills.[Task].Limits.xp` to the amount of xp required to do the task.
-- Set `Config.Skills.[Task].Rewards.xp` to the amount of xp you want to give on success.
-- Set `Config.Skills.[Task].Rewards.multi` to the multiplier based on the players level/ current xp.
+- `minigames: table`
+  - `{thermite: {size: intger, squares: integer, rounds: integer, time: integer, attempts: integer}}`
+    - `size: integer` - (5, 6, 7, 8, 9, 10) size of grid by square units, ie. gridsize = 5 is a 5 * 5 (25) square grid.
+    - `squares: integer` - Number of squares to complete the game.
+    - `rounds: integer` - Number of rounds to complete the game.
+    - `time: integer` - Time showing the puzzle in ms. | 1000 = 1 second
+    - `attempts: integer` - Number of incorrect blocks after which the game will fail.
+  - `{hack: {size: integer, time: integer}}`
+    - `size: integer` - Grid size for the minigame.
+    - `time: integer` - Time limit for the minigame in ms. | 1000 = 1 second
+- `weapons: string[]` - Weapons allowed to smash a case.
 
-### 2. Door Configs
+#### Doorlock Presets
 
-- Make a copy of the door config below and place it inside `qb-doorlocks/configs/` in it's own .lua file.
-
-- **If using ox_doorlock, the file must be named `jewellery_stores` and can be placed in the convert folder.**
+##### qb-doorlock
 
 ```lua
 Config.DoorList['jewellery-citymain'] = {
-    doorType = 'double',
-    locked = true,
-    cantUnlock = true,
-    doorLabel = 'main',
-    distance = 2,
-    doors = {
-        {objName = 9467943, objYaw = 306.00003051758, objCoords = vec3(-630.426514, -238.437546, 38.206532)},
-        {objName = 1425919976, objYaw = 306.00003051758, objCoords = vec3(-631.955383, -236.333267, 38.206532)}
-    },
-    doorRate = 1.0,
+  doorType = 'double',
+  locked = true,
+  cantUnlock = true,
+  doorLabel = 'main',
+  distance = 2,
+  doors = {
+    {objName = 9467943, objYaw = 306.00003051758, objCoords = vec3(-630.426514, -238.437546, 38.206532)},
+    {objName = 1425919976, objYaw = 306.00003051758, objCoords = vec3(-631.955383, -236.333267, 38.206532)}
+  },
+  doorRate = 1.0,
 }
 
 Config.DoorList['jewellery-citysec'] = {
-    objYaw = 36.000022888184,
-    doorRate = 1.0,
-    locked = true,
-    fixText = false,
-    pickable = true,
-    authorizedJobs = { ['police'] = 0 },
-    needsAllItems = false,
-    objCoords = vec3(-629.133850, -230.151703, 38.206585),
-    distance = 1.5,
-    doorType = 'door',
-    objName = 1335309163,
+  objYaw = 36.000022888184,
+  doorRate = 1.0,
+  locked = true,
+  fixText = false,
+  pickable = true,
+  authorizedJobs = { ['police'] = 0 },
+  needsAllItems = false,
+  objCoords = vec3(-629.133850, -230.151703, 38.206585),
+  distance = 1.5,
+  doorType = 'door',
+  objName = 1335309163,
 }
 
 Config.DoorList['jewellery-grapemain'] = {
-    doorType = 'double',
-    locked = true,
-    cantUnlock = true,
-    doorLabel = 'main',
-    distance = 2,
-    doors = {
-        {objName = 9467943, objYaw = 98.17839050293, objCoords = vec3(1653.285522, 4884.148438, 42.309845)},
-        {objName = 1425919976, objYaw = 98.17839050293, objCoords = vec3(1653.655518, 4881.573730, 42.309845)}
-    },
-    doorRate = 1.0,
+  doorType = 'double',
+  locked = true,
+  cantUnlock = true,
+  doorLabel = 'main',
+  distance = 2,
+  doors = {
+    {objName = 9467943, objYaw = 98.17839050293, objCoords = vec3(1653.285522, 4884.148438, 42.309845)},
+    {objName = 1425919976, objYaw = 98.17839050293, objCoords = vec3(1653.655518, 4881.573730, 42.309845)}
+  },
+  doorRate = 1.0,
 }
 
 Config.DoorList['jewellery-grapesec'] = {
-    pickable = true,
-    objCoords = vec3(1648.274902, 4877.423340, 42.309898),
-    objName = 1335309163,
-    doorRate = 1.0,
-    distance = 1,
-    authorizedJobs = { ['police'] = 0 },
-    doorType = 'door',
-    objYaw = 188.17839050293,
-    fixText = false,
-    doorLabel = 'sec',
-    locked = true,
+  pickable = true,
+  objCoords = vec3(1648.274902, 4877.423340, 42.309898),
+  objName = 1335309163,
+  doorRate = 1.0,
+  distance = 1,
+  authorizedJobs = { ['police'] = 0 },
+  doorType = 'door',
+  objYaw = 188.17839050293,
+  fixText = false,
+  doorLabel = 'sec',
+  locked = true,
 }
 
 Config.DoorList['jewellery-palmain'] = {
-    doorType = 'double',
-    locked = true,
-    cantUnlock = true,
-    doorLabel = 'main',
-    distance = 2,
-    doors = {
-        {objName = 1425919976, objYaw = 314.90930175781, objCoords = vec3(-383.837921, 6044.059082, 31.658920)},
-        {objName = 9467943, objYaw = 314.90930175781, objCoords = vec3(-382.001617, 6042.216797, 31.658920)}
-    },
-    doorRate = 1.0,
+  doorType = 'double',
+  locked = true,
+  cantUnlock = true,
+  doorLabel = 'main',
+  distance = 2,
+  doors = {
+    {objName = 1425919976, objYaw = 314.90930175781, objCoords = vec3(-383.837921, 6044.059082, 31.658920)},
+    {objName = 9467943, objYaw = 314.90930175781, objCoords = vec3(-382.001617, 6042.216797, 31.658920)}
+  },
+  doorRate = 1.0,
 }
 
 Config.DoorList['jewellery-palsec'] = {
-    doorType = 'door',
-    locked = true,
-    doorRate = 1.0,
-    pickable = true,
-    distance = 1.5,
-    objYaw = 44.909275054932,
-    fixText = false,
-    authorizedJobs = { ['police'] = 0 },
-    objCoords = vec3(-382.007721, 6050.603027, 31.658974),
-    objName = 1335309163,
+  doorType = 'door',
+  locked = true,
+  doorRate = 1.0,
+  pickable = true,
+  distance = 1.5,
+  objYaw = 44.909275054932,
+  fixText = false,
+  authorizedJobs = { ['police'] = 0 },
+  objCoords = vec3(-382.007721, 6050.603027, 31.658974),
+  objName = 1335309163,
 }
 ```
 
-## OX Doorlock 
+### Support
 
-- If using ox_doorlock, and the door configs above cause errors in this heist, set `Config.DoorLock.Extraname` to the main name of the door in your database.
-
-- Highlighted below is an example of what name in the database you should set `Config.DoorLock.Extraname` to.
-
-<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; align-content: center;">
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/1024287310424047716/1085926698815590461/Jewellery_Stores_for_Readme.PNG.jpg" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">OX Door Configs in Database</p>
-    </div>
-</div>
-
-## CD Doorlock Images
-
-How your doorlocks should look on [cd_doorlock](https://forum.cfx.re/t/paid-codesign-door-lock/5005862) after implementing them!
-
-<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; align-content: center;">
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084338161628495923/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">City Main Door</p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084338217219797052/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">City Second Door</p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084338278506971197/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">Grapeseed Main Door</p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084338329706840144/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">Grapeseed Second Door</p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084341564446343168/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">Paleto Main Door</p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px;">
-        <img src="https://cdn.discordapp.com/attachments/898673216116109324/1084338478663348224/image.png" style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
-        <p style="margin: 0; font-size: 20px; font-weight: bold;">Paleto Second Door</p>
-    </div>
-</div>
-
-## Support
-
-This is not a QBCore script nor is it maintained by them, please refer to my discord for any issues!
-
-- [discord](https://discord.gg/tVA58nbBuk)
+- Join the [Grouse Labs discord](https://discord.gg/pmywChNQ5m).
+- Use the appropriate support forum!
