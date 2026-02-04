@@ -164,28 +164,25 @@ end
 ---@param coords vector3
 ---@return string?, integer?, integer?
 local function get_closest_case(coords)
-  local closest_ent
-  local closest_coord
+  local closest
+  local entity
+  local location
   local dist = math.huge
-  for i = 1, #start_case_models do
-    local entity = GetClosestObjectOfType(coords.x, coords.y, coords.z, 1.0, start_case_models[i], false, true, false)
-    if entity ~= 0 then
-      local fnd_coords = GetEntityCoords(entity)
+  for k, cases in pairs(JEWELLERY_CASES) do
+    for i = 1, #cases do
+      local case = cases[i]
+      local fnd_coords = case.coords
       local fnd_dist = #(coords - fnd_coords)
 
       if fnd_dist < dist then
-        closest_coord = fnd_coords
-        closest_ent = entity
+        closest = i
+        entity = GetClosestObjectOfType(fnd_coords.x, fnd_coords.y, fnd_coords.z, 0.1, case.start_prop, true, true, false)
+        location = k
         dist = fnd_dist
       end
     end
   end
-  for location, cases in pairs(JEWELLERY_CASES) do
-    for i = 1, #cases do
-      local case = cases[i]
-      if #(case.coords - closest_coord) <= 1.0 then return location, i, closest_ent end
-    end
-  end
+  return location, closest, entity
 end
 
 ---@param location string?
