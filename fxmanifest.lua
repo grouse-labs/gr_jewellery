@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Grouse Labs'
-description 'Grouse Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features'
+description 'Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features'
 version '1.3.5'
 url 'https://github.com/grouse-labs/gr_jewellery'
 
@@ -14,6 +14,6 @@ server_script 'server/main.lua'
 
 files {'shared/*.lua', 'client/config.lua', 'locales/*.lua'}
 
-dependencies {'/onesync', 'gr_lib', 'bridge', 'glitch-minigames'}
+dependencies {'/onesync', 'gr_lib', 'gr_blips', 'bridge', 'glitch-minigames'}
 
 lua54 'yes'

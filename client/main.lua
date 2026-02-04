@@ -399,6 +399,16 @@ local function init_script(resource)
   })
 
   for k, v in pairs(LOCATIONS) do
+    local coords = v.coords
+    exports.gr_blips:new('coord', {
+      coords = coords
+    }, {
+      sprite = 617,
+      name = translate('general.store_label'),
+      display = 'map',
+      primary = 3,
+      style = {scale = 0.4, short_range = true}
+    })
     local thermite = v.thermite
     Zones[#Zones + 1] = bridge.target.addboxzone({
       center = thermite.coords,
