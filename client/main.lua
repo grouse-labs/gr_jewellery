@@ -176,21 +176,26 @@ local function smash_case(location, case, entity)
   local ped = PlayerPedId()
   local case_data = JEWELLERY_CASES[location][case]
   local coords = case_data.coords
-  -- local offset = GetAnimInitialOffsetPosition(dict, anim, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 2)
   local heading = case_data.heading
   local offset = GetOffsetFromCoordAndHeadingInWorldCoords(coords.x, coords.y, coords.z, heading, 0.0, -1.0, 0.0)
   local duration = GetAnimDuration(dict, anim)
   local sequence = OpenSequenceTask()
   ---@diagnostic disable-next-line: param-type-mismatch
-  TaskFollowNavMeshToCoord(0, offset.x, offset.y, offset.z, 1.0, 1000, 0.5, 512, heading)
+  TaskFollowNavMeshToCoord(0, offset.x, offset.y, offset.z, 1.0, 1500, 0.5, 512, heading)
   TaskPlayAnimAdvanced(0, dict, anim, offset.x, offset.y, offset.z, 0.0, 0.0, heading, 1.0, 1.0, duration, 1090527232 --[[+ 4194304 Adds Collision on Impact]], 0.0)
   CloseSequenceTask(sequence)
   TaskPerformSequence(ped, sequence)
   ClearSequenceTask(sequence)
+  RemoveAnimDict(dict)
   CreateThread(function()
-    repeat
+    while GetEntityAnimCurrentTime(ped, dict, anim) <= 0.04 do
       Wait(0)
-    until GetEntityAnimCurrentTime(ped, dict, anim) > 0.04
+      if not GetIsTaskActive(ped, 32) then
+        ClearPedTasks(ped)
+        TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'busy', false)
+        return
+      end
+    end
     TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'open', true)
     bridge.callback.trigger('jewellery:server:IsStoreVulnerable', 100, function(hacked, hit)
       if not hacked and not GlobalState['jewellery:alarm'] then
@@ -210,11 +215,10 @@ local function smash_case(location, case, entity)
         end
       end
     end, location)
-    RemoveAnimDict(dict)
-    if not core.isplayergloved() then
-      TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
-    end
   end)
+  if not core.isplayergloved() then
+    TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
+  end
 end
 
 ---@param location string
@@ -377,7 +381,7 @@ local function init_script(resource)
       coords = coords
     }, {
       sprite = 617,
-      name = glib.locale.iskeyvalid('general.store_labels') and translate('general.store_labels.'..k) or translate('general.store_label'),
+      name = glib.locale.iskeyvalid('general.store_labels.'..k) and translate('general.store_labels.'..k) or translate('general.store_label'),
       display = 'map',
       primary = 3,
       style = {scale = 0.4, short_range = true}
