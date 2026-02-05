@@ -18,32 +18,6 @@ local translate = glib.locale.translate
 
 --------------------- FUNCTIONS ---------------------
 
-local function createBlips()
-  if not Config.OneStore then
-    for k, v in pairs(Config.Stores) do
-      local Dealer = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
-      SetBlipSprite (Dealer, 617)
-      SetBlipDisplay(Dealer, 4)
-      SetBlipScale  (Dealer, 0.7)
-      SetBlipAsShortRange(Dealer, true)
-      SetBlipColour(Dealer, 3)
-      AddTextEntry(v.label, v.label)
-      BeginTextCommandSetBlipName(v.label)
-      EndTextCommandSetBlipName(Dealer)
-    end
-  else
-    local Dealer = AddBlipForCoord(Config.Stores[1].coords.x, Config.Stores[1].coords.y, Config.Stores[1].coords.z)
-    SetBlipSprite (Dealer, 617)
-    SetBlipDisplay(Dealer, 4)
-    SetBlipScale  (Dealer, 0.7)
-    SetBlipAsShortRange(Dealer, true)
-    SetBlipColour(Dealer, 3)
-    AddTextEntry(Config.Stores[1].label, Config.Stores[1].label)
-    BeginTextCommandSetBlipName(Config.Stores[1].label)
-    EndTextCommandSetBlipName(Dealer)
-  end
-end
-
 -- Legacy Code if I want to add this functionality back in future 😅
 -- local function getCamID(k)
 --   local camID = 0
@@ -98,8 +72,15 @@ local function set_case_state(location, index, state)
     CreateModelSwap(coords.x, coords.y, coords.z, 0.1, end_prop, start_prop, false)
     RemoveModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
   else
+    local ptfx = 'scr_jewelheist'
     CreateModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
     RecordBrokenGlass(coords.x, coords.y, coords.z, 1.0)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    glib.audio.playsoundatcoords(true, nil, 'Glass_Smash', coords, 0, 0, false)
+    if not glib.stream.ptfx(ptfx) then return end
+    UseParticleFxAsset(ptfx)
+    StartParticleFxNonLoopedAtCoord('scr_jewel_cab_smash', coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 1.0, false, false, false)
+    RemoveNamedPtfxAsset(ptfx)
   end
 end
 
@@ -207,16 +188,10 @@ local function smash_case(location, case, entity)
   TaskPerformSequence(ped, sequence)
   ClearSequenceTask(sequence)
   CreateThread(function()
-    local ptfx = 'scr_jewelheist'
-    while GetEntityAnimCurrentTime(ped, dict, anim) <= 0.04 do
+    repeat
       Wait(0)
-    end
+    until GetEntityAnimCurrentTime(ped, dict, anim) > 0.04
     TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'open', true)
-    ---@diagnostic disable-next-line: param-type-mismatch
-    glib.audio.playsoundatcoords(true, nil, 'Glass_Smash', offset, 0, 0, false)
-    if not glib.stream.ptfx(ptfx) then return end
-    UseParticleFxAsset(ptfx)
-    StartParticleFxNonLoopedOnEntity('scr_jewel_cab_smash', GetCurrentPedWeaponEntityIndex(ped), 0.0, 0.0, -0.1, 0.0, 0.0, 0.0, 1.0, false, false, false)
     bridge.callback.trigger('jewellery:server:IsStoreVulnerable', 100, function(hacked, hit)
       if not hacked and not GlobalState['jewellery:alarm'] then
         local chance = math.random(100)
@@ -236,7 +211,6 @@ local function smash_case(location, case, entity)
       end
     end, location)
     RemoveAnimDict(dict)
-    RemoveNamedPtfxAsset(ptfx)
     if not core.isplayergloved() then
       TriggerServerEvent('evidence:server:CreateFingerDrop', coords)
     end
@@ -384,7 +358,6 @@ local function init_script(resource)
       name = 'jewel_heist',
       icon = 'fa fa-hand',
       label = translate('general.target_label'),
-      -- item = WEAPONS,
       canInteract = function()
         return isLoggedIn and not bridge.callback.await('jewellery:server:IsCaseBusy', false) and is_brandishing_weapon()
       end,
@@ -404,7 +377,7 @@ local function init_script(resource)
       coords = coords
     }, {
       sprite = 617,
-      name = translate('general.store_label'),
+      name = glib.locale.iskeyvalid('general.store_labels') and translate('general.store_labels.'..k) or translate('general.store_label'),
       display = 'map',
       primary = 3,
       style = {scale = 0.4, short_range = true}
