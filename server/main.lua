@@ -27,10 +27,10 @@ local function set_door_state(location, _type, state, and_sec)
   if not IsSrcAPlayer(src) then return end
   if _type == 'hit' then
     local doors = LOCATIONS[location]?.doors
-    if not doors then return end
+    if not doors or not doors[1] then error('No doors set for location '..location) end
     bridge.doorlock.setstate(src, doors[1], not state)
     Stores[location].locked = not state
-    if and_sec then
+    if and_sec and doors[2] then
       bridge.doorlock.setstate(src, doors[2], not state)
     end
   elseif _type == 'hacked' then
@@ -38,9 +38,10 @@ local function set_door_state(location, _type, state, and_sec)
       if v.doors then
         for i = 1, #v.doors do
           local door = v.doors[i]
+          if not door then error('No door #'..i..' set for location '..k) end
           bridge.doorlock.setstate(src, door, not state)
         end
-        Stores[k].locked = true
+        Stores[k].locked = not state
       end
     end
   end
