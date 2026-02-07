@@ -200,6 +200,13 @@ local function set_store_state(location, _type, state)
 end
 
 ---@param player string|integer
+---@return table? cases
+local function get_case_states(player)
+  if not bridge.core.getplayer(player) then return end
+  return Cases
+end
+
+---@param player string|integer
 ---@return boolean?
 local function is_case_busy(player)
   if not bridge.core.getplayer(player) then return end
@@ -255,13 +262,20 @@ RegisterServerEvent('jewellery:server:SetCaseState', set_case_state)
 RegisterServerEvent('jewellery:server:VangelicoAlarm', set_alarm_state)
 RegisterServerEvent('jewellery:server:SetStoreState', set_store_state)
 
+-------------------------------- EXPORTS --------------------------------
+
+exports('setcasestate', set_case_state)
+exports('setalarmstate', set_alarm_state)
+exports('setstorestate', set_store_state)
+exports('getcasestates', get_case_states)
+exports('iscasebusy', is_case_busy)
+exports('getpolicepresence', get_police_presence)
+exports('isstorevulnerable', is_store_vulnerable)
+exports('isstoreopen', is_store_open)
+
 -------------------------------- CALLBACKS --------------------------------
 
-bridge.callback.register('jewellery:server:GetCaseStates', function(player)
-  if not bridge.core.getplayer(player) then return end
-  return Cases
-end)
-
+bridge.callback.register('jewellery:server:GetCaseStates', get_case_states)
 bridge.callback.register('jewellery:server:IsCaseBusy', is_case_busy)
 bridge.callback.register('jewellery:server:GetPolicePresence', get_police_presence)
 bridge.callback.register('jewellery:server:IsStoreVulnerable', is_store_vulnerable)
