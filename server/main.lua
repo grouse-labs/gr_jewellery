@@ -105,7 +105,7 @@ local function init_script(resource)
       police = LOCATIONS[location] and LOCATIONS[location].police,
       hit = false,
       hacked = false,
-      locked = false
+      locked = true
     }
     Cooldowns[location] = {locks = false, cases = {}, alarm = false}
     for i = 1, #data do
