@@ -1,3 +1,4 @@
+---@type {cooldowns: {locks: integer, cases: integer, alarm: integer}, autolock: boolean, patrols: {enable: boolean, name: string}, hours: {open: integer, close: integer}, rewards: table}
 return {
   cooldowns = {
     locks = 5,
@@ -5,6 +6,10 @@ return {
     alarm = 5
   },
   autolock = true,
+  patrols = {
+    enable = false,
+    name = 'gr_patrols'
+  },
   hours = {
     open = 9,
     close = 17

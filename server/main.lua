@@ -9,7 +9,9 @@ local ALARM_COOLDOWN <const> = CONFIG.cooldowns.alarm * 60
 local OPEN_HOUR <const> = CONFIG.hours.open
 local CLOSE_HOUR <const> = CONFIG.hours.close
 local AUTOLOCK <const> = CONFIG.autolock
+local PATROLS_CONFIG <const> = CONFIG.patrols
 local REWARDS <const> = CONFIG.rewards
+local PATROLS <const> = glib.require(RES_NAME..'.server.patrols') --[[@module 'gr_jewellery.server.patrols']]
 local Cases = {}
 local Stores = {}
 local PresenceCache = {}
@@ -56,6 +58,11 @@ end
 ---@async
 local function main_thread()
   GlobalState:set('jewellery:alarm', false, true)
+  if PATROLS_CONFIG.enable then
+    for _, v in pairs(PATROLS) do
+      exports[PATROLS_CONFIG.name]:createpatrol(v)
+    end
+  end
   while true do
     Wait(1000)
     for location, _types in pairs(Cooldowns) do
