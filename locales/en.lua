@@ -25,5 +25,10 @@ return {
     target_label = 'Smash Display Case',
     thermite_label = 'Blow Fuse Box',
     hack_label = 'Disable Alarm System'
+  },
+  debug = {
+    enable = '%{version} - Debug Mode %{state}!^7',
+    no_doors = 'No doors set for location %{location}',
+    no_door_i = 'No door #%<index>.d set for location %{location}'
   }
 }

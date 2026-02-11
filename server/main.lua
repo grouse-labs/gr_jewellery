@@ -27,7 +27,7 @@ local function set_door_state(location, _type, state, and_sec)
   if not IsSrcAPlayer(src) then return end
   if _type == 'hit' then
     local doors = LOCATIONS[location]?.doors
-    if not doors or not doors[1] then error('No doors set for location '..location) end
+    if not doors or not doors[1] then error(translate('debug.no_doors', {location = location})) end
     bridge.doorlock.setstate(src, doors[1], not state)
     Stores[location].locked = not state
     if and_sec and doors[2] then
@@ -38,7 +38,7 @@ local function set_door_state(location, _type, state, and_sec)
       if v.doors then
         for i = 1, #v.doors do
           local door = v.doors[i]
-          if not door then error('No door #'..i..' set for location '..k) end
+          if not door then error(translate('debug.no_door_i', {index = i, location = location})) end
           bridge.doorlock.setstate(src, door, not state)
         end
         Stores[k].locked = not state
@@ -122,7 +122,7 @@ local function init_script(resource)
     glib.github.check(resource, 'grouse-labs', 'gr_jewellery')
     local version = GetResourceMetadata(resource, 'version', 0)
     version = version:match('(%d+%.%d+)'):gsub('(%d+)%.(%d+)', 'v^4%1^7.^4%2^7')
-    bridge.print(version..' - Debug Mode '..(DEBUG_MODE and '^2Enabled' or '^1Disabled')..'!^7')
+    bridge.print(translate('debug.enable', {version = version, state = DEBUG_MODE and '^2Enabled' or '^1Disabled'}))
     main_thread()
   end)
 end
