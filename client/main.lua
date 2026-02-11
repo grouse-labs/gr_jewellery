@@ -12,6 +12,7 @@ local start_case_models = {
   `des_jewel_cab3_start`,
   `des_jewel_cab4_start`
 }
+local Alarms = {}
 local Blips = {}
 local Zones = {}
 local isLoggedIn = false
@@ -73,11 +74,13 @@ local function set_case_state(location, index, state)
   local start_prop = case.start_prop
   local end_prop = case.end_prop
   if not state then
-    CreateModelSwap(coords.x, coords.y, coords.z, 0.1, end_prop, start_prop, false)
-    RemoveModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
+    if start_prop and end_prop then
+      CreateModelSwap(coords.x, coords.y, coords.z, 0.1, end_prop, start_prop, false)
+      RemoveModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
+    end
   else
     local ptfx = 'scr_jewelheist'
-    CreateModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
+    if start_prop and end_prop then CreateModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false) end
     RecordBrokenGlass(coords.x, coords.y, coords.z, 1.0)
     ---@diagnostic disable-next-line: param-type-mismatch
     glib.audio.playsoundatcoords(true, nil, 'Glass_Smash', coords, 0, 0, false)
@@ -104,13 +107,44 @@ local function set_cases(cases)
   end
 end
 
----@param skip boolean?
-local function play_jewel_alarm(skip)
-  PrepareAlarm('JEWEL_STORE_HEIST_ALARMS')
-  repeat
-    Wait(0)
-  until PrepareAlarm('JEWEL_STORE_HEIST_ALARMS')
-  StartAlarm('JEWEL_STORE_HEIST_ALARMS', skip == true)
+---@async
+---@param location string
+---@param index integer
+local function draw_light(location, index)
+  if not Alarms[location][index] then return end
+  CreateThread(function()
+    local config = LOCATIONS[location].alarms
+    local coords = config.coords
+    coords = type(coords) == 'table' and coords or {coords}
+    coords = coords[index]
+    while Alarms[location][index] do
+      Wait(500)
+      DrawLightWithRangeAndShadow(coords.x, coords.y, coords.z - 0.85, 255, 0, 0, 5.0, 10.0, 1.0)
+      if not Alarms or not Alarms[location] then break end
+    end
+  end)
+end
+
+---@param location string
+local function play_jewel_alarm(location)
+  local config = LOCATIONS[location].alarms
+  local coords = config.coords
+  local sound = config.sound
+  local range = config.range
+  coords = type(coords) == 'table' and coords or {coords}
+  Alarms[location] = {}
+  for i = 1, #coords do
+    Alarms[location][i] = glib.audio.playsoundatcoords(true, sound.bank, sound.name, coords[i], sound.ref, range, false, true)
+    SetTimeout(100, function() draw_light(location, i) end)
+  end
+end
+
+---@param location string
+local function stop_jewel_alarm(location)
+  for i = 1, #Alarms[location] do
+    glib.audio.stopsound(Alarms[location][i])
+  end
+  Alarms[location] = nil
 end
 
 ---@param resource string?
@@ -121,8 +155,9 @@ local function deinit_script(resource)
   RemoveAnimDict('amb@world_human_seat_wall_tablet@female@base')
   RemoveNamedPtfxAsset('scr_jewelheist')
   RemoveNamedPtfxAsset('scr_ornate_heist')
-  StopAlarm('JEWEL_STORE_HEIST_ALARMS', true)
+  ReleaseNamedScriptAudioBank('ALARM_BELL_02')
   bridge.target.removemodel(start_case_models)
+  for k in pairs(Alarms) do stop_jewel_alarm(k) end
   for i = 1, #Zones do bridge.target.removezone(Zones[i]) end
   for i = 1, #Blips do exports.gr_blips:remove(Blips[i]) end
   isLoggedIn = false
@@ -205,9 +240,7 @@ local function smash_case(location, case, entity)
         local chance = math.random(100)
         if chance < (not bridge.callback.await('jewellery:server:IsStoreOpen') and 70 or 100) then
           -- Alert Police Dispatch
-          if location == 'main' then
-            TriggerServerEvent('jewellery:server:VangelicoAlarm', location, true)
-          end
+          TriggerServerEvent('jewellery:server:VangelicoAlarm', location, true)
           -- if Config.Dispatch == 'qb' then
           --   TriggerServerEvent('police:server:policeAlert', 'Robbery in progress')
           -- elseif Config.Dispatch == 'ps' then
@@ -344,7 +377,7 @@ local function hack_security(location)
         bridge.notify.text(translate('success.hacked'), 'success')
         TriggerServerEvent('jewellery:server:SetStoreState', location, 'hacked', true)
       end
-      if GlobalState['jewellery:alarm'] then TriggerServerEvent('jewellery:server:VangelicoAlarm', location, false) end
+      if GlobalState[('jewellery:alarm:%s'):format(location)] then TriggerServerEvent('jewellery:server:VangelicoAlarm', location, false) end
     end, location)
   end
   StopAnimTask(ped, dict, 'base', 8.0)
@@ -357,8 +390,8 @@ local function init_script(resource)
   if resource and type(resource) == 'string' and resource ~= RES_NAME then return end
   isLoggedIn = LocalPlayer.state.isLoggedIn or IsPlayerPlaying(PlayerId())
   bridge.callback.trigger('jewellery:server:GetCaseStates', 1000, set_cases)
-  if GlobalState['jewellery:alarm'] then
-    play_jewel_alarm(true)
+  if GlobalState['jewellery:alarm'] and GlobalState['jewellery:alarm'].state then
+    play_jewel_alarm(GlobalState['jewellery:alarm'].location)
   end
   bridge.target.addmodel(start_case_models, {
     {
@@ -446,13 +479,16 @@ end
 
 AddEventHandler('onResourceStart', init_script)
 AddEventHandler('onResourceStop', deinit_script)
-AddStateBagChangeHandler('jewellery:alarm', 'global', function(_, _, state)
-  if state then
-    play_jewel_alarm()
-  else
-    StopAlarm('JEWEL_STORE_HEIST_ALARMS', true)
-  end
-end)
+for location in pairs(LOCATIONS) do
+  AddStateBagChangeHandler(('jewellery:alarm:%s'):format(location), 'global', function(_, _, state)
+    if state == nil then return end
+    if state and not Alarms[location] then
+      play_jewel_alarm(location)
+    elseif not state and Alarms[location] then
+      stop_jewel_alarm(location)
+    end
+  end)
+end
 
 --------------------- EVENTS ---------------------
 

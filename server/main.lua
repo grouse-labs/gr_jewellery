@@ -134,7 +134,7 @@ local function deinit_script(resource)
   Stores = {}
   PresenceCache = {}
   Cooldowns = {}
-  GlobalState['jewellery:alarm'] = false
+  for k in pairs(LOCATIONS) do GlobalState:set(('jewellery:alarm:%s'):format(k), false, true) end
 end
 
 ---@param player string|integer
@@ -176,7 +176,7 @@ local function set_alarm_state(location, state)
   if not PresenceCache[src] then return end -- Triggered without using target
   if not LOCATIONS[location] then return end
   if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
-  GlobalState:set('jewellery:alarm', state, true)
+  GlobalState:set(('jewellery:alarm:%s'):format(location), state, true)
   Cooldowns[location].alarm = state and ALARM_COOLDOWN
 end
 
