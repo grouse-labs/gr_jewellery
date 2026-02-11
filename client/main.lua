@@ -17,6 +17,7 @@ local Blips = {}
 local Zones = {}
 local isLoggedIn = false
 local translate = glib.locale.translate
+local unpack = table.unpack
 
 --------------------- FUNCTIONS ---------------------
 
@@ -128,8 +129,10 @@ local function draw_light(location, index)
   if not Alarms[location][index] then return end
   CreateThread(function()
     local config = LOCATIONS[location].alarms
+    if not config then return end
     local coords = config.coords
     coords = type(coords) == 'table' and coords or {coords}
+    ---@diagnostic disable-next-line: cast-local-type
     coords = coords[index]
     while Alarms[location][index] do
       Wait(500)
@@ -142,6 +145,7 @@ end
 ---@param location string
 local function play_jewel_alarm(location)
   local config = LOCATIONS[location].alarms
+  if not config then return end
   local coords = config.coords
   local sound = config.sound
   local range = config.range
@@ -321,13 +325,7 @@ local function use_thermite(location, coords, heading)
     if phase >= 0.4 and IsEntityAttached(thermite) then
       DetachEntity(thermite, true, true)
       FreezeEntityPosition(thermite, true)
-      if not exports['glitch-minigames']:StartMemoryGame(
-        THERMITE.size,
-        THERMITE.squares,
-        THERMITE.rounds,
-        THERMITE.time,
-        THERMITE.attempts
-      ) then
+      if not exports[THERMITE.resource][THERMITE.export](nil, unpack(THERMITE.settings)) then
         Wait(500)
         scene:clear(false, true)
         abort = true
@@ -376,7 +374,7 @@ local function hack_security(location)
   TaskPlayAnim(ped, dict, 'base', 8.0, -8.0, -1, 50, 1.0, false, false, false)
   Wait(2000)
 
-  if not leo and not exports['glitch-minigames']:StartPipePressureGame(HACK.size, HACK.time) then
+  if not leo and not exports[HACK.resource][HACK.export](nil, unpack(HACK.settings)) then
     bridge.notify.text(translate('error.fail_hack'), 'error')
   else
     bridge.callback.trigger('jewellery:server:IsStoreVulnerable', false, function()
