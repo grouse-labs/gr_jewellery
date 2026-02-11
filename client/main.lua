@@ -440,7 +440,7 @@ local function init_script(resource)
         name = 'jewellery:thermite:'..k,
         icon = 'fas fa-bug',
         label = translate('general.thermite_label'),
-        item = 'thermite',
+        item = thermite.item,
         canInteract = function()
           local _, hit = bridge.callback.await('jewellery:server:IsStoreVulnerable', false, k)
           return isLoggedIn and not hit
@@ -465,7 +465,7 @@ local function init_script(resource)
           name = 'jewellery:hack:'..k,
           icon = 'fas fa-bug',
           label = translate('general.hack_label'),
-          item = 'phone',
+          item = hack.item,
           canInteract = function()
             local hacked = bridge.callback.await('jewellery:server:IsStoreVulnerable', false, k)
             return isLoggedIn and not hacked

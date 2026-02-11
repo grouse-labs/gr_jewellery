@@ -200,9 +200,10 @@ local function set_store_state(location, _type, state)
   if not LOCATIONS[location] then return end
   if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
   if _type == 'hit' and state then
-    if not bridge.core.doesplayerhaveitem(src, 'thermite') then return end -- Triggered without item, definitely cheating
-    bridge.core.removeplayeritem(src, 'thermite', 1)
-    bridge.notify.item(src, 'thermite', -1)
+    local item = LOCATIONS.thermite.item
+    if not bridge.core.doesplayerhaveitem(src, item) then return end -- Triggered without item, definitely cheating
+    bridge.core.removeplayeritem(src, item, 1)
+    bridge.notify.item(src, item, -1)
   end
   Stores[location][_type] = state
   Cooldowns[location].locks = state and LOCK_COOLDOWN

@@ -1,4 +1,4 @@
----@type {[string]: {coords: vector3, doors: string[], police: integer, alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}, range: number}?, thermite: {coords: vector3, heading: number, size: vector3}, hack: {coords: vector3, heading: number, size: vector3}?}}
+---@type {[string]: {coords: vector3, doors: string[], police: integer, alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}, range: number}?, thermite: {coords: vector3, heading: number, size: vector3, item: string}, hack: {coords: vector3, heading: number, size: vector3, item: string}?}}
 return {
   main = {
     coords = vector3(-630.5, -237.13, 38.08),
@@ -16,12 +16,14 @@ return {
     thermite = {
       coords = vector3(-596.02, -283.7, 50.4),
       heading = 300.0,
-      size = vector3(0.4, 0.8, 1.2)
+      size = vector3(0.4, 0.8, 1.2),
+      item = 'thermite'
     },
     hack = {
       coords = vector3(-631.04, -230.63, 38.06),
       heading = 37.0,
-      size = vector3(0.4, 0.6, 1.0)
+      size = vector3(0.4, 0.6, 1.0),
+      item = 'phone'
     }
   },
   grape = {
@@ -40,7 +42,8 @@ return {
     thermite = {
       coords = vector3(1645.07, 4867.87, 42.03),
       heading = 8.0,
-      size = vector3(0.4, 0.8, 1.2)
+      size = vector3(0.4, 0.8, 1.2),
+      item = 'thermite'
     }
   },
   paleto = {
@@ -59,7 +62,8 @@ return {
     thermite = {
       coords = vector3(-368.35, 6055.36, 31.5),
       heading = 135.0,
-      size = vector3(0.4, 0.8, 1.2)
+      size = vector3(0.4, 0.8, 1.2),
+      item = 'thermite'
     }
   }
 }
