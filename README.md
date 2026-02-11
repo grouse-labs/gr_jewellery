@@ -8,10 +8,13 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 - 3 Stores preconfigured (using [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261)) by default!
 - Unique cooldowns for each case, the main store alarm and all store locks.
 - Serversided door control with auto-locking at preconfigured times.
-- Hacking the security system computer has *extra benefits*, LEO's by default can use it's `disable` feature.
-- Thermite the store fusebox to unlock the front doors!
-- Alarms & Alerts have different a chance to trigger depending on the time of day!
-- All case effects are synced across the server, so all players see & hear the same thing.
+- Hacking the security system computer has *extra benefits*, LEO's by default can use it's `alarmdisable` feature.
+- Multiple Alarms for each store, with lights, synced between all players up to a preconfigured range!
+- Alarms and alerts have different chances to trigger depending on time of day.
+- Supports [Grouse Patrols](https://youtu.be/HnPzlaKyBp8?si=VXNGA_lXpBW0fuZz), coming with a preconfigured patrol!
+- Cases have complete effects, with destroyed models, glass ptfx and native sounds!
+- All effects are synced between all clients, *at all times*, so you're always immersed.
+- Minigames are by default configured for [Glitch Minigames](https://github.com/Gl1tchStudios/glitch-minigames), but can be easily changed to any resource via the [client config](#client-config).
 
 ## Table of Contents
 
@@ -22,7 +25,7 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
     - [Preview](#preview)
     - [Installation](#installation)
       - [Dependencies](#dependencies)
-        - [Glitch Minigames](#glitch-minigames)
+        - [Minigames](#minigames)
         - [Grouse](#grouse)
         - [Server Specific](#server-specific)
       - [Initial Setup](#initial-setup)
@@ -32,6 +35,7 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
       - [Creating Stores](#creating-stores)
       - [Adding Cases](#adding-cases)
       - [Server Config](#server-config)
+      - [Patrols](#patrols)
       - [Client Config](#client-config)
       - [Doorlock Presets](#doorlock-presets)
         - [qb-doorlock](#qb-doorlock)
@@ -57,7 +61,9 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 
 **This script requires the following scripts to be installed:**
 
-##### Glitch Minigames
+##### Minigames
+
+**Minigame resources can be configured in [client config](#client-config), by default Glitch Minigames is configured.**
 
 - [glitch_minigames](https://github.com/Gl1tchStudios/glitch-minigames/releases/tag/v2.0.0)
 
@@ -68,6 +74,8 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 - [gr_blips](https://github.com/grouse-labs/gr_blips)
 
 ##### Server Specific
+
+*Please note, weather resources are optional dependencies.*
 
 | Framework   | Callback | Target    | Notify      | Doorlock    | Weather             |
 | ----------- | -------- | --------- | ----------- | ----------- | ------------------- |
@@ -125,6 +133,15 @@ main = {
   coords = vector3(-630.5, -237.13, 38.08),
   doors = {'jewellery-citymain', 'jewellery-citysec'},
   police = 0,
+  alarms = {
+    coords = {vector3(-625.25, -237.57, 41.17), vector3(-629.52, -231.68, 41.17), vector3(-620.44, -225.08, 41.18), vector3(-616.16, -230.97, 41.18)},
+    sound = {
+      bank = 'ALARM_BELL_02',
+      name = 'Bell_02',
+      ref = 'ALARMS_SOUNDSET'
+    },
+    range = 100.0
+  },
   thermite = {
     coords = vector3(-596.02, -283.7, 50.4),
     heading = 300.0,
@@ -143,6 +160,7 @@ main = {
 - `coords: vector3` - The coords for the store blip.
 - `doors: string[]` - The doors to the store, where index 1 is the main and index 2 is the secondary.
 - `police: integer` - How much police much be present to trigger the heist.
+- `alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}}` - Config for the sounds, locations and range.
 - `thermite: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
 - `hack: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
 
@@ -174,6 +192,10 @@ main = {
     alarm = 5
   },
   autolock = true,
+  patrols = {
+    enable = false,
+    name = 'gr_patrols'
+  },
   hours = {
     open = 9,
     close = 17
@@ -188,8 +210,13 @@ main = {
 
 - `cooldowns: {locks: integer, cases: integer, alarm: integer}` - Cooldown in minutes before reset.
 - `autolock: boolean` - Disable/enable the serverside time locked functionality.
+- `patrols: {enable: boolean, name: string}` - Enable patrols created from [Grouse Patrols](https://youtu.be/HnPzlaKyBp8?si=VXNGA_lXpBW0fuZz).
 - `hours: {open: integer, close: integer}`- In 24 hour time.
 - `rewards: {item: string, amount: integer|{min: integer, max: integer}}`- Possible rewards and amounts for a successful case smashed.
+
+#### Patrols
+
+**Please Refer to [Grouse Patrols README](https://github.com/grouse-labs/gr_patrols)**
 
 #### Client Config
 
@@ -197,15 +224,14 @@ main = {
 {
   minigames = {
     thermite = {
-      size = 5,
-      squares = 4,
-      rounds = 3,
-      time = 3000,
-      attempts = 10
+      resource = 'glitch-minigames',
+      export = 'StartMemoryGame',
+      settings = {5, 4, 3, 3000, 10}
     },
     hack = {
-      size = 6,
-      time = 30000
+      resource = 'glitch-minigames',
+      export = 'StartPipePressureGame',
+      settings = {6, 30000}
     }
   },
   weapons = {
@@ -227,15 +253,14 @@ main = {
 ```
 
 - `minigames: table`
-  - `{thermite: {size: intger, squares: integer, rounds: integer, time: integer, attempts: integer}}`
-    - `size: integer` - (5, 6, 7, 8, 9, 10) size of grid by square units, ie. gridsize = 5 is a 5 * 5 (25) square grid.
-    - `squares: integer` - Number of squares to complete the game.
-    - `rounds: integer` - Number of rounds to complete the game.
-    - `time: integer` - Time showing the puzzle in ms. | 1000 = 1 second
-    - `attempts: integer` - Number of incorrect blocks after which the game will fail.
-  - `{hack: {size: integer, time: integer}}`
-    - `size: integer` - Grid size for the minigame.
-    - `time: integer` - Time limit for the minigame in ms. | 1000 = 1 second
+  - `{thermite: {resource: string, export: string, settings: any[]}` - Please refer to your preferred minigames resource documentation.
+    - `resource: string` - Resource name.
+    - `export: string` - Export name.
+    - `settings: any[]` - Parameters to pass to the above export, in the order they are defined in the exports documenation.
+  - `{hack: {resource: string, export: string, settings: any[]}` - Please refer to your preferred minigames resource documentation.
+    - `resource: string` - Resource name.
+    - `export: string` - Export name.
+    - `settings: any[]` - Parameters to pass to the above export, in the order they are defined in the exports documenation.
 - `weapons: string[]` - Weapons allowed to smash a case.
 
 #### Doorlock Presets
