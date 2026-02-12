@@ -13,7 +13,10 @@ return {
   },
   info = {
     hacking_attempt = 'Connecting to the security system..',
-    close_warning = 'Hurry! The store will close in 1 minute'
+    close_warning = 'Hurry! The store will close in 1 minute',
+    suss_dispatch = 'Suspicious Activity',
+    case_dispatch = 'Robbery in progress',
+    thermite_dispatch = 'Explosion Reported'
   },
   general = {
     store_label = 'Vangelico Jewellers', -- Comment out if you want to use unique labels for each store

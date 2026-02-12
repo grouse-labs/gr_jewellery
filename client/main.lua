@@ -5,6 +5,7 @@ local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[
 local CONFIG <const> = glib.require(RES_NAME..'.client.config') --[[@module 'gr_jewellery.client.config']]
 local THERMITE <const> = CONFIG.minigames.thermite
 local HACK <const> = CONFIG.minigames.hack
+local DISPATCH <const> = CONFIG.dispatch
 local WEAPONS <const> = CONFIG.weapons
 local start_case_models = {
   `des_jewel_cab_start`,
@@ -14,53 +15,11 @@ local start_case_models = {
 }
 local Alarms = {}
 local Blips = {}
-local Zones = {}
 local isLoggedIn = false
 local translate = glib.locale.translate
 local unpack = table.unpack
 
 --------------------- FUNCTIONS ---------------------
-
--- Legacy Code if I want to add this functionality back in future 😅
--- local function getCamID(k)
---   local camID = 0
---   if k <= 6 then
---     camID = 31
---   elseif k == 7 or k >= 18 and k <= 20 then
---     camID = 32
---   elseif k >= 12 and k <= 17 then
---     camID = 33
---   elseif k >= 8 and k <= 11 then
---     camID = 34
---   elseif k >= 21 and k <= 26 then
---     camID = 35
---   elseif k >= 27 and k <= 32 then
---     camID = 36
---   end
---   return camID
--- end
-
--- local function checkSkill(hack)
---   local retval = false
---   local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
---   local currXP = skill['Current']
---   local reqXP = Config.Skills[hack]['Limits'].xp
---   if currXP >= reqXP then
---     retval = true
---   end
---   return retval
--- end
-
--- local function addSkillToPlayer(hack)
---   local reward = Config.Skills[hack]['Rewards'].xp
---   local multi = Config.Skills[hack]['Rewards'].multi
---   local skill = exports[Config.Skills.system]:GetCurrentSkill(Config.Skills[hack].skill)
---   local currXP = skill['Current']
---   if currXP <= 0 then currXP = 1 end
---   local xp = math.floor(reward * multi * (currXP * 0.001))
---   if xp < reward then xp = reward end
---   exports[Config.Skills.system]:UpdateSkill(Config.Skills[hack].skill, xp)
--- end
 
 -- Worried if this can be exploited by a client triggering it with random location/index/state values.<br>
 -- I have server checks in place for the important stuff like police dispatch and rewards so should be fine?<br>
@@ -223,6 +182,19 @@ local function get_closest_case(coords)
   return location, closest, entity
 end
 
+---@param _type string
+---@param cam integer?
+local function alert_dispatch(_type, cam)
+  if not DISPATCH[_type] then return end
+  local is_event = DISPATCH.event
+  local name = DISPATCH.name
+  if is_event then
+    TriggerServerEvent(name, translate(('info.%s_dispatch'):format(_type)), _type ~= 'case' and nil or cam)
+  elseif DISPATCH[_type].export then
+    exports[name][DISPATCH[_type].export](nil, _type ~= 'case' and nil or cam)
+  end
+end
+
 ---@param location string?
 ---@param case integer?
 ---@param entity integer?
@@ -262,15 +234,8 @@ local function smash_case(location, case, entity)
       if not hacked and not GlobalState[('jewellery:alarm:%s'):format(location)] then
         local chance = math.random(100)
         if chance < (not bridge.callback.await('jewellery:server:IsStoreOpen') and 70 or 100) then
-          -- Alert Police Dispatch
-          TriggerServerEvent('jewellery:server:VangelicoAlarm', location, true)
-          -- if Config.Dispatch == 'qb' then
-          --   TriggerServerEvent('police:server:policeAlert', 'Robbery in progress')
-          -- elseif Config.Dispatch == 'ps' then
-          --   exports['ps-dispatch']:VangelicoRobbery(getCamID(case))
-          -- elseif Config.Dispatch == 'cd' then
-          --   alertsCD('robbery')
-          -- end
+          local cams = type(case_data.cams) == 'table' and case_data.cams or {case_data.cams}
+          alert_dispatch('case', cams[#cams > 1 and math.random(#cams) or 1])
         end
       end
     end, location)
@@ -285,16 +250,7 @@ end
 ---@param heading number
 local function use_thermite(location, coords, heading)
   local chance = math.random(100)
-  if chance <= 10 then
-    -- Alert Police Dispatch: Suspcious Activity
-    -- if Config.Dispatch == 'qb' then
-    --   TriggerServerEvent('police:server:policeAlert', 'Suspicious Activity')
-    -- elseif Config.Dispatch == 'ps' then
-    --   exports['ps-dispatch']:SuspiciousActivity()
-    -- elseif Config.Dispatch == 'cd' then
-    --   alertsCD('suspicious')
-    -- end
-  end
+  if chance <= 10 then alert_dispatch('suss') end
 
   local dict = 'anim@heists@ornate_bank@thermal_charge'
   if not glib.stream.animdict(dict) then return end
@@ -346,14 +302,7 @@ local function use_thermite(location, coords, heading)
       if not hacked then
         chance = math.random(100)
         if chance < (not bridge.callback.await('jewellery:server:IsStoreOpen') and 85 or 100) then
-          -- Alert Police Dispatch: Explosion
-          -- if Config.Dispatch == 'qb' then
-          --   TriggerServerEvent('police:server:policeAlert', 'Explosion Reported')
-          -- elseif Config.Dispatch == 'ps' then
-          --   exports["ps-dispatch"]:Explosion()
-          -- elseif Config.Dispatch == 'cd' then
-          --   alertsCD('explosion')
-          -- end
+          alert_dispatch('thermite')
         end
       end
       if hit then return end

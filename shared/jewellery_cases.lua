@@ -7,109 +7,129 @@ local hash_case_end_3 = `des_jewel_cab3_end`
 local hash_case_start_4 = `des_jewel_cab4_start`
 local hash_case_end_4 = `des_jewel_cab4_end`
 ---@diagnostic disable: assign-type-mismatch
----@type {[string]: {coords: vector3, heading: number, start_prop: integer, end_prop: integer}[]}
+---@type {[string]: {coords: vector3, heading: number, start_prop: integer, end_prop: integer, cams: integer|integer[]?}[]}
 return {
   main = {
     {
       coords = vector3(-627.21, -234.89, 37.65),
       heading = 36.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = {44, 45}
     }, {
       coords = vector3(-626.16, -234.13, 37.65),
-      start_prop = hash_case_start_4,
       heading = 36.0,
-      end_prop = hash_case_end_4
+      start_prop = hash_case_start_4,
+      end_prop = hash_case_end_4,
+      cams = {44, 45}
     }, {
       coords = vector3(-626.54, -233.6, 37.65),
       heading = 216.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = {44, 45}
     }, {
       coords = vector3(-627.59, -234.37, 37.65),
       heading = 216.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = {44, 45}
     }, {
       coords = vector3(-625.28, -238.29, 37.65),
       heading = 216.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = {44, 45}
     }, {
       coords = vector3(-626.33, -239.05, 37.65),
       heading = 216.0,
       start_prop = hash_case_start_2,
-      end_prop = hash_case_end_2
+      end_prop = hash_case_end_2,
+      cams = {44, 45}
     }, {
       coords = vector3(-623.96, -230.72, 37.65),
-      heaing = 216.0,
+      heading = 216.0,
       start_prop = hash_case_start_4,
-      end_prop = hash_case_end_4
+      end_prop = hash_case_end_4,
+      cams = {45, 46}
     }, {
       coords = vector3(-622.62, -232.56, 37.65),
       heading = 306.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = {45, 46}
     }, {
       coords = vector3(-619.85, -234.91, 37.65),
       heading = 216.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = 46
     }, {
       coords = vector3(-618.8, -234.15, 37.65),
       heading = 216.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = 46
     }, {
       coords = vector3(-620.52, -232.88, 37.65),
       heading = 36.0,
       start_prop = hash_case_start_4,
-      end_prop = hash_case_end_4
+      end_prop = hash_case_end_4,
+      cams = 46
     }, {
       coords = vector3(-617.09, -230.16, 37.65),
       heading = 306.0,
       start_prop = hash_case_start_2,
-      end_prop = hash_case_end_2
+      end_prop = hash_case_end_2,
+      cams = {46, 47}
     }, {
       coords = vector3(-617.85, -229.11, 37.65),
       heading = 306.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = {46, 47}
     }, {
       coords = vector3(-620.18, -230.79, 37.65),
       heading = 126.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = {46, 47}
     }, {
       coords = vector3(-621.52, -228.95, 37.65),
       heading = 126.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = {46, 47}
     }, {
       coords = vector3(-619.2, -227.25, 37.65),
       heading = 306.0,
       start_prop = hash_case_start_2,
-      end_prop = hash_case_end_2
+      end_prop = hash_case_end_2,
+      cams = {46, 47}
     }, {
       coords = vector3(-619.97, -226.2, 37.65),
       heading = 306.0,
       start_prop = hash_case_start,
-      end_prop = hash_case_end
+      end_prop = hash_case_end,
+      cams = {46, 47}
     }, {
       coords = vector3(-624.28, -226.61, 37.65),
       heading = 36.0,
       start_prop = hash_case_start_4,
-      end_prop = hash_case_end_4
+      end_prop = hash_case_end_4,
+      cams = {45, 47}
     }, {
       coords = vector3(-625.33, -227.37, 37.65),
       heading = 36.0,
       start_prop = hash_case_start_3,
-      end_prop = hash_case_end_3
+      end_prop = hash_case_end_3,
+      cams = {45, 47}
     }, {
       coords = vector3(-623.61, -228.63, 37.65),
       heading = 216.0,
       start_prop = hash_case_start_2,
-      end_prop = hash_case_end_2
+      end_prop = hash_case_end_2,
+      cams = {45, 47}
     }
   },
   grape = {
