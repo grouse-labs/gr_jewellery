@@ -59,7 +59,6 @@ end
 
 ---@async
 local function main_thread()
-  GlobalState:set('jewellery:alarm', false, true)
   if PATROLS_CONFIG.enable then
     for _, v in pairs(PATROLS) do
       exports[PATROLS_CONFIG.name]:createpatrol(v)
@@ -97,7 +96,7 @@ local function main_thread()
       if _types.alarm then
         _types.alarm -= 1
         if _types.alarm == 0 then
-          GlobalState['jewellery:alarm'] = false
+          GlobalState[('jewellery:alarm:%s'):format(location)] = false
         end
       end
     end
@@ -159,6 +158,14 @@ local function give_case_reward(player)
 end
 
 ---@param location string
+---@param state boolean
+local function set_alarm_state(location, state)
+  if not LOCATIONS[location] or GlobalState[('jewellery:alarm:%s'):format(location)] == state then return end
+  GlobalState:set(('jewellery:alarm:%s'):format(location), state, true)
+  Cooldowns[location].alarm = state and ALARM_COOLDOWN
+end
+
+---@param location string
 ---@param case integer
 ---@param _type string
 ---@param state boolean
@@ -174,6 +181,8 @@ local function set_case_state(location, case, _type, state)
     TriggerClientEvent('jewellery:client:SetCaseState', -1, location, case, state)
     if not state then return end
     give_case_reward(src)
+    if Stores[location].hacked or GlobalState[('jewellery:alarm:%s'):format(location)] then return end
+    set_alarm_state(location, true)
   end
 end
 
@@ -188,18 +197,6 @@ local function thermite_effect(location)
 end
 
 ---@param location string
----@param state boolean
-local function set_alarm_state(location, state)
-  local src = source
-  if not bridge.core.getplayer(src) then return end
-  if not PresenceCache[src] then return end -- Triggered without using target
-  if not LOCATIONS[location] then return end
-  if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
-  GlobalState:set(('jewellery:alarm:%s'):format(location), state, true)
-  Cooldowns[location].alarm = state and ALARM_COOLDOWN
-end
-
----@param location string
 ---@param _type string
 ---@param state boolean
 local function set_store_state(location, _type, state)
@@ -209,10 +206,17 @@ local function set_store_state(location, _type, state)
   if not LOCATIONS[location] then return end
   if #(LOCATIONS[location].coords - GetEntityCoords(GetPlayerPed(src))) > 100.0 then return end
   if _type == 'hit' and state then
-    local item = LOCATIONS.thermite.item
+    local item = LOCATIONS[location].thermite.item
     if not bridge.core.doesplayerhaveitem(src, item) then return end -- Triggered without item, definitely cheating
-    bridge.core.removeplayeritem(src, item, 1)
-    bridge.notify.item(src, item, -1)
+    SetTimeout(1000, function()
+      bridge.core.removeplayeritem(src, item, 1)
+      bridge.notify.item(src, item, -1)
+      set_alarm_state(location, false)
+    end)
+  elseif _type == 'hack' and state then
+    local item = LOCATIONS[location].hack.item
+    if not bridge.core.doesplayerhaveitem(src, item) then return end -- Triggered without item, definitely cheating
+    set_alarm_state(location, false)
   end
   Stores[location][_type] = state
   Cooldowns[location].locks = state and LOCK_COOLDOWN
@@ -251,13 +255,9 @@ local function get_police_presence(player, location)
   local store = Stores[location]
   if #(store.coords - coords) > 100.0 then return end
   local players = GetPlayers()
+  local leo_jobs = GetTypeJobs('leo')
   local amount = 0
-  for i = 1, #players do
-    local src = players[i]
-    if bridge.core.doesplayerhavegroup(src, GetTypeJobs('leo')) then
-      amount += 1
-    end
-  end
+  for i = 1, #players do amount += bridge.core.doesplayerhavegroup(players[i], leo_jobs) and 1 or 0 end
   PresenceCache[player] = amount
   return amount >= store.police
 end
@@ -280,7 +280,6 @@ AddEventHandler('onResourceStart', init_script)
 AddEventHandler('onResourceStop', deinit_script)
 RegisterServerEvent('jewellery:server:SetCaseState', set_case_state)
 RegisterServerEvent('jewellery:server:SyncThermite', thermite_effect)
-RegisterServerEvent('jewellery:server:VangelicoAlarm', set_alarm_state)
 RegisterServerEvent('jewellery:server:SetStoreState', set_store_state)
 
 -------------------------------- EXPORTS --------------------------------
