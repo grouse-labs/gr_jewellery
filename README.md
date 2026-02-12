@@ -15,6 +15,7 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 - Cases have complete effects, with destroyed models, glass ptfx and native sounds!
 - All effects are synced between all clients, *at all times*, so you're always immersed.
 - Minigames are by default configured for [Glitch Minigames](https://github.com/Gl1tchStudios/glitch-minigames), but can be easily changed to any resource via the [client config](#client-config).
+- Dispatch alerts can be easily configured via the [client config](#client-config) and your locales file!
 
 ## Table of Contents
 
@@ -69,9 +70,9 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 
 ##### Grouse
 
-- [gr_lib](https://github.com/grouse-labs/gr_lib)
-- [bridge](https://github.com/grouse-labs/bridge)
-- [gr_blips](https://github.com/grouse-labs/gr_blips)
+- [gr_lib](https://github.com/grouse-labs/gr_lib/releases/latest)
+- [bridge](https://github.com/grouse-labs/bridge/releases/latest)
+- [gr_blips](https://github.com/grouse-labs/gr_blips/releases/latest)
 
 ##### Server Specific
 
@@ -89,7 +90,7 @@ Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Featu
 | [es_extended](https://github.com/esx-framework/esx_core)                      | 1.13.4  |
 | [qbx_core](https://github.com/Qbox-project/qbx_core)                          | 1.23.0  |
 | [ox_lib](https://github.com/CommunityOx/ox_lib)                               | 3.30.6  |
-| [gr_lib](https://github.com/grouse-labs/gr_lib)                               | 1.1.1   |
+| [gr_lib](https://github.com/grouse-labs/gr_lib)                               | 1.1.3   |
 | [ox_inventory](https://github.com/CommunityOx/ox_inventory)                   | 2.44.8  |
 | [qb-inventory](https://github.com/qbcore-framework/qb-inventory)              | 2.0.0   |
 | [ox_target](https://github.com/CommunityOx/ox_target)                         | 1.17.2  |
@@ -133,6 +134,7 @@ main = {
   coords = vector3(-630.5, -237.13, 38.08),
   doors = {'jewellery-citymain', 'jewellery-citysec'},
   police = 0,
+  interior_id = 82690,
   alarms = {
     coords = {vector3(-625.25, -237.57, 41.17), vector3(-629.52, -231.68, 41.17), vector3(-620.44, -225.08, 41.18), vector3(-616.16, -230.97, 41.18)},
     sound = {
@@ -160,6 +162,7 @@ main = {
 - `coords: vector3` - The coords for the store blip.
 - `doors: string[]` - The doors to the store, where index 1 is the main and index 2 is the secondary.
 - `police: integer` - How much police much be present to trigger the heist.
+- `interior_id: integer` - The interior id of the store, used for the store closing warning.
 - `alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}}` - Config for the sounds, locations and range.
 - `thermite: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
 - `hack: {coords: vector3, heading: number, size: vector3}`- Config for the targets and animations.
@@ -172,7 +175,8 @@ main = {
     coords = vector3(-627.21, -234.89, 37.65),
     heading = 36.0,
     start_prop = hash_case_start_3,
-    end_prop = hash_case_end_3
+    end_prop = hash_case_end_3,
+    cams = {44, 45}
   }
 }
 ```
@@ -181,6 +185,7 @@ main = {
 - `heading: number`
 - `start_prop: integer`
 - `end_prop: integer`
+- `cams: integer|integer[]` - Camera IDs (if used) for dispatch alerts.
 
 #### Server Config
 
@@ -234,6 +239,19 @@ main = {
       settings = {6, 30000}
     }
   },
+  dispatch = {
+    event = true,
+    name = 'police:server:policeAlert', -- if event is false, it's uses the exports defined below from this resource. ie 'ps-dispatch'
+    suss = {
+      export = false -- 'SuspiciousActivity' for exports['ps-dispatch']:SuspiciousActivity()
+    },
+    case = {
+      export = false
+    },
+    thermite = {
+      export = false
+    }
+  },
   weapons = {
     'weapon_assaultrifle',
     'weapon_carbinerifle',
@@ -261,6 +279,12 @@ main = {
     - `resource: string` - Resource name.
     - `export: string` - Export name.
     - `settings: any[]` - Parameters to pass to the above export, in the order they are defined in the exports documenation.
+- `dispatch: table`
+  - `event: boolean` - Whether your preferred dispatch script uses an event or exports.
+  - `name: string` - Either the event name or export resource name.
+  - `{suss: {export: boolean}}`
+  - `{case: {export: boolean}}`
+  - `{thermite: {export: boolean}}`
 - `weapons: string[]` - Weapons allowed to smash a case.
 
 #### Doorlock Presets
@@ -290,7 +314,7 @@ Config.DoorList['jewellery-citysec'] = {
   authorizedJobs = { ['police'] = 0 },
   needsAllItems = false,
   objCoords = vec3(-629.133850, -230.151703, 38.206585),
-  distance = 1.5,
+  distance = 2.5,
   doorType = 'door',
   objName = 1335309163,
 }
@@ -313,7 +337,7 @@ Config.DoorList['jewellery-grapesec'] = {
   objCoords = vec3(1648.274902, 4877.423340, 42.309898),
   objName = 1335309163,
   doorRate = 1.0,
-  distance = 1,
+  distance = 2.5,
   authorizedJobs = { ['police'] = 0 },
   doorType = 'door',
   objYaw = 188.17839050293,
@@ -340,7 +364,7 @@ Config.DoorList['jewellery-palsec'] = {
   locked = true,
   doorRate = 1.0,
   pickable = true,
-  distance = 1.5,
+  distance = 2.5,
   objYaw = 44.909275054932,
   fixText = false,
   authorizedJobs = { ['police'] = 0 },
@@ -367,7 +391,7 @@ Config.DoorList['jewellery-citysec'] = {
   authorizedJobs = { ['police'] = 0 },
   needsAllItems = false,
   objCoords = vec3(-629.133850, -230.151703, 38.206585),
-  distance = 1.5,
+  distance = 2.5,
   doorType = 'door',
   objName = 1335309163,
 }
@@ -390,7 +414,7 @@ Config.DoorList['jewellery-grapesec'] = {
   objCoords = vec3(1648.274902, 4877.423340, 42.309898),
   objName = 1335309163,
   doorRate = 1.0,
-  distance = 1,
+  distance = 2.5,
   authorizedJobs = { ['police'] = 0 },
   doorType = 'door',
   objYaw = 188.17839050293,
@@ -417,7 +441,7 @@ Config.DoorList['jewellery-palsec'] = {
   locked = true,
   doorRate = 1.0,
   pickable = true,
-  distance = 1.5,
+  distance = 2.5,
   objYaw = 44.909275054932,
   fixText = false,
   authorizedJobs = { ['police'] = 0 },
