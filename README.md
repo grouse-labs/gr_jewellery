@@ -1,26 +1,73 @@
-# gr_jewellery
+# gr_jewellery — Free FiveM Jewellery Robbery Script
 
-Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features.
+**gr_jewellery** is a fully featured, performance-focused **Jewellery Heist system for FiveM**, designed with immersion, configurability, and server stability in mind.
 
-## Features
+Rob multiple stores, trigger dynamic alarm systems, disable power with thermite, hack security networks, and manage door locks with fully server-side control. Built to feel alive and reactive — without sacrificing performance.
 
-- Optimised code, resting at `0.00ms`, peaking at `0.01-0.02ms` whilst animating or changing locks.
-- 3 Stores preconfigured (using [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261)) by default!
-- Unique cooldowns for each case, the main store alarm and all store locks.
-- Serversided door control with auto-locking at preconfigured times.
-- Hacking the security system computer has *extra benefits*, LEO's by default can use it's `alarmdisable` feature.
-- Multiple Alarms for each store, with lights, synced between all players up to a preconfigured range!
-- Alarms and alerts have different chances to trigger depending on time of day.
-- Supports [Grouse Patrols](https://youtu.be/HnPzlaKyBp8?si=VXNGA_lXpBW0fuZz), coming with a preconfigured patrol!
-- Cases have complete effects, with destroyed models, glass ptfx and native sounds!
-- All effects are synced between all clients, *at all times*, so you're always immersed.
-- Minigames are by default configured for [Glitch Minigames](https://github.com/Gl1tchStudios/glitch-minigames), but can be easily changed to any resource via the [client config](#client-config).
-- Dispatch alerts can be easily configured via the [client config](#client-config) and your locales file!
+---
+
+## Key Features
+
+- ⚡ **Highly Optimised**
+  - 0.00ms idle  
+  - 0.01–0.02ms during animations or lock state changes  
+  - Designed for stable long-term server performance  
+
+- 🏬 **Multiple Store Support**
+  - 3 stores preconfigured (using [GigZ Jewel Store](https://forum.cfx.re/t/mlo-jewel-store-by-gigz/4857261))  
+  - Easily expandable for additional locations  
+
+- 🔐 **Advanced Lock & Alarm System**
+  - Unique cooldowns for:
+    - Individual display cases  
+    - Store alarms  
+    - Store door locks  
+  - Fully server-side door control  
+  - Automatic door locking at configurable times  
+
+- 🚨 **Dynamic Alarm Behaviour**
+  - Multiple alarms per store  
+  - Synced sirens and emergency lighting  
+  - 🔴 Map blips flash while alarms are active  
+  - 🕒 Time-of-day based alert trigger chances  
+  - 🗺️ Blips visually indicate store state (reduced opacity when closed)  
+  - Configurable alert ranges  
+
+- 🔥 **Thermite Power Sabotage**
+  - Disable store power using thermite  
+  - Unlocks the main locked entrance  
+  - Disables the active alarm system  
+  - Fully synced visual and particle effects  
+  - Adds a high-risk, high-reward escalation option
+  - Easily adaptable to custom minigames
+
+- 💻 **Security System Hacking**
+  - Hack the store computer for additional advantages  
+  - Built-in `alarmdisable` functionality (default for LEO)  
+  - Easily adaptable to custom minigames  
+
+- 💎 **Immersive Glass Effects**
+  - Destroyed display models  
+  - Glass particle effects  
+  - Native GTA sound effects  
+  - Fully synced between all players at all times  
+
+- 🧩 **Minigame Flexibility**
+  - Pre-configured for [Glitch Minigames](https://github.com/Gl1tchStudios/glitch-minigames)  
+  - Easily replaceable with any minigames resource via the client config  
+
+- 📡 **Dispatch & Alert Integration**
+  - Fully configurable dispatch alerts  
+  - Customisable via client config and locale files
+
+- 👮‍♂️ **Grouse Patrols Integration**
+  - Includes a preconfigured patrol setup
+  - Seamlessly escalates robberies with AI patrol units
 
 ## Table of Contents
 
-- [gr\_jewellery](#gr_jewellery)
-  - [Features](#features)
+- [gr\_jewellery — Free FiveM Jewellery Robbery Script](#gr_jewellery--free-fivem-jewellery-robbery-script)
+  - [Key Features](#key-features)
   - [Table of Contents](#table-of-contents)
     - [Credits](#credits)
     - [Preview](#preview)
