@@ -152,13 +152,15 @@ local function play_jewel_alarm(location)
   coords = type(coords) == 'table' and coords or {coords}
   Alarms[location] = {}
   for i = 1, #coords do
-    Alarms[location][i] = glib.audio.playsoundatcoords(true, sound.bank, sound.name, coords[i], sound.ref, range, false, true)
+    Alarms[location][i] = glib.audio.playsoundatcoords(true, sound.bank, sound.name, coords[i]--[[@as vector3]], sound.ref, range, false, true)
     SetTimeout(100, function() draw_light(location, i) end)
   end
+  ReleaseNamedScriptAudioBank('ALARM_BELL_02')
 end
 
 ---@param location string
 local function stop_jewel_alarm(location)
+  if not Alarms[location] then return end
   for i = 1, #Alarms[location] do
     glib.audio.stopsound(Alarms[location][i])
   end
@@ -175,9 +177,12 @@ local function deinit_script(resource)
   RemoveNamedPtfxAsset('scr_ornate_heist')
   ReleaseNamedScriptAudioBank('ALARM_BELL_02')
   bridge.target.removemodel(start_case_models)
-  for k in pairs(Alarms) do stop_jewel_alarm(k) end
-  for i = 1, #Zones do bridge.target.removezone(Zones[i]) end
-  for i = 1, #Blips do exports.gr_blips:remove(Blips[i]) end
+  for location, config in pairs(LOCATIONS) do
+    if Alarms[location] then stop_jewel_alarm(location) end
+    if config.thermite then bridge.target.removezone('jewellery:thermite:'..location) end
+    if config.hack then bridge.target.removezone('jewellery:hack:'..location) end
+    if Blips[location] then exports.gr_blips:remove(Blips[location]) end
+  end
   isLoggedIn = false
 end
 
@@ -254,7 +259,7 @@ local function smash_case(location, case, entity)
     end
     TriggerServerEvent('jewellery:server:SetCaseState', location, case, 'open', true)
     bridge.callback.trigger('jewellery:server:IsStoreVulnerable', 100, function(hacked, hit)
-      if not hacked and not GlobalState['jewellery:alarm'] then
+      if not hacked and not GlobalState[('jewellery:alarm:%s'):format(location)] then
         local chance = math.random(100)
         if chance < (not bridge.callback.await('jewellery:server:IsStoreOpen') and 70 or 100) then
           -- Alert Police Dispatch
@@ -382,7 +387,6 @@ local function hack_security(location)
         bridge.notify.text(translate('success.hacked'), 'success')
         TriggerServerEvent('jewellery:server:SetStoreState', location, 'hacked', true)
       end
-      if GlobalState[('jewellery:alarm:%s'):format(location)] then TriggerServerEvent('jewellery:server:VangelicoAlarm', location, false) end
     end, location)
   end
   StopAnimTask(ped, dict, 'base', 8.0)
@@ -418,17 +422,18 @@ local function init_script(resource)
 
   for k, v in pairs(LOCATIONS) do
     local coords = v.coords
-    Blips[#Blips + 1] = exports.gr_blips:new('coord', {
+    Blips[k] = exports.gr_blips:new('coord', {
       coords = coords
     }, {
       sprite = 617,
       name = glib.locale.iskeyvalid('general.store_labels.'..k) and translate('general.store_labels.'..k) or translate('general.store_label'),
       display = 'map',
       primary = 3,
-      style = {scale = 0.4, short_range = true}
+      style = {scale = 0.4, short_range = true},
+      flashes = {enable = Alarms[k] ~= nil, interval = 500, colour = 1},
     })
     local thermite = v.thermite
-    Zones[#Zones + 1] = bridge.target.addboxzone({
+    bridge.target.addboxzone({
       center = thermite.coords,
       size = thermite.size,
       heading = thermite.heading,
@@ -453,7 +458,7 @@ local function init_script(resource)
     })
     local hack = v.hack
     if hack then
-      Zones[#Zones + 1] = bridge.target.addboxzone({
+      bridge.target.addboxzone({
         center = hack.coords,
         size = hack.size,
         heading = hack.heading,
@@ -489,8 +494,12 @@ for location in pairs(LOCATIONS) do
     if state == nil then return end
     if state and not Alarms[location] then
       play_jewel_alarm(location)
+      if not Blips[location] then return end
+      exports.gr_blips:setflashes(Blips[location], {enable = true, interval = 500, colour = 1})
     elseif not state and Alarms[location] then
       stop_jewel_alarm(location)
+      if not Blips[location] then return end
+      exports.gr_blips:setflashes(Blips[location], {enable = false})
     end
   end)
 end
