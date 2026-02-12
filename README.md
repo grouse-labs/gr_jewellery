@@ -1,5 +1,11 @@
 # gr_jewellery — Free FiveM Jewellery Robbery Script
 
+<a href="https://youtu.be/Gzq6njJgyhY" target="_blank">
+  <img src="https://github.com/grouse-labs/.github/blob/main/profile/assets/jewellery_thumbnail.png?raw=true" style="width:640px;height:360px;" alt="Patrols Thumbnail">
+</a>
+
+---
+
 **gr_jewellery** is a fully featured, performance-focused **Jewellery Heist system for FiveM**, designed with immersion, configurability, and server stability in mind.
 
 Rob multiple stores, trigger dynamic alarm systems, disable power with thermite, hack security networks, and manage door locks with fully server-side control. Built to feel alive and reactive — without sacrificing performance.
