@@ -69,6 +69,7 @@ local function main_thread()
     for location, _types in pairs(Cooldowns) do
       if _types.locks and _types.locks ~= 0 then
         _types.locks -= 1
+        if _types.locks == 60 then TriggerClientEvent('jewellery:client:StoreClosing', -1, location) end
         if _types.locks == 0 then
           set_door_state(location, 'hacked', false)
           Stores[location].hit = false

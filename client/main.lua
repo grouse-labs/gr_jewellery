@@ -81,6 +81,14 @@ local function thermite_effect(location)
   RemoveNamedPtfxAsset(ptfx)
 end
 
+---@param location string
+local function store_close_warning(location)
+  if not LOCATIONS[location] then return end
+  local id = LOCATIONS[location].interior_id
+  if GetInteriorFromEntity(PlayerPedId()) ~= id then return end
+  bridge.notify.text(translate('info.close_warning'), 'primary')
+end
+
 ---@async
 ---@param location string
 ---@param index integer
@@ -475,3 +483,4 @@ end
 RegisterNetEvent(bridge.core.getevent('unload'), deinit_script)
 RegisterNetEvent('jewellery:client:SetCaseState', set_case_state)
 RegisterNetEvent('jewellery:client:SyncThermite', thermite_effect)
+RegisterNetEvent('jewellery:client:StoreClosing', store_close_warning)

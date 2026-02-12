@@ -1,9 +1,10 @@
----@type {[string]: {coords: vector3, doors: string[], police: integer, alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}, range: number}?, thermite: {coords: vector3, heading: number, size: vector3, item: string}, hack: {coords: vector3, heading: number, size: vector3, item: string}?}}
+---@type {[string]: {coords: vector3, doors: string[], police: integer, interior_id: integer, alarms: {coords: vector3|vector3[], sound: {bank: string, name: string, ref: string}, range: number}?, thermite: {coords: vector3, heading: number, size: vector3, item: string}, hack: {coords: vector3, heading: number, size: vector3, item: string}?}}
 return {
   main = {
     coords = vector3(-630.5, -237.13, 38.08),
     doors = {'jewellery-citymain', 'jewellery-citysec'},
     police = 0,
+    interior_id = 82690,
     alarms = {
       coords = {vector3(-625.25, -237.57, 41.17), vector3(-629.52, -231.68, 41.17), vector3(-620.44, -225.08, 41.18), vector3(-616.16, -230.97, 41.18)},
       sound = {
@@ -30,6 +31,7 @@ return {
     coords = vector3(1649.78, 4882.32, 42.16),
     doors = {'jewellery-grapemain', 'jewellery-grapesec'},
     police = 0,
+    interior_id = 121090,
     alarms = {
       coords = {vector3(1648.3, 4885.79, 45.27), vector3(1649.33, 4878.59, 45.27)},
       sound = {
@@ -50,6 +52,7 @@ return {
     coords = vector3(-378.45, 6047.68, 32.69),
     doors = {'jewellery-palmain', 'jewellery-palsec'},
     police = 0,
+    interior_id = 120834,
     alarms = {
       coords = {vector3(-377.02, 6043.88, 34.62), vector3(-382.16, 6049.03, 34.62)},
       sound = {
