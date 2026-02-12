@@ -380,6 +380,7 @@ local function init_script(resource)
       primary = 3,
       style = {scale = 0.4, short_range = true},
       flashes = {enable = Alarms[k] ~= nil, interval = 500, colour = 1},
+      opacity = GlobalState[('jewellery:open:%s'):format(k)] and 255 or 255/2
     })
     local thermite = v.thermite
     bridge.target.addboxzone({
@@ -439,6 +440,16 @@ end
 AddEventHandler('onResourceStart', init_script)
 AddEventHandler('onResourceStop', deinit_script)
 for location in pairs(LOCATIONS) do
+  AddStateBagChangeHandler(('jewellery:open:%s'):format(location), 'global', function(_, _, state)
+    if state == nil then return end
+    if state then
+      if not Blips[location] then return end
+      exports.gr_blips:setopacity(Blips[location], 255)
+    else
+      if not Blips[location] then return end
+      exports.gr_blips:setopacity(Blips[location], 255/2)
+    end
+  end)
   AddStateBagChangeHandler(('jewellery:alarm:%s'):format(location), 'global', function(_, _, state)
     if state == nil then return end
     if state and not Alarms[location] then

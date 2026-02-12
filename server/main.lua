@@ -77,9 +77,11 @@ local function main_thread()
       elseif AUTOLOCK then
         if not is_store_open() then
           if not Stores[location].locked then
+            GlobalState:set(('jewellery:open:%s'):format(location), false, true)
             set_door_state(location, 'hit', false, true)
           end
         elseif Stores[location].locked then
+          GlobalState:set(('jewellery:open:%s'):format(location), true, true)
           set_door_state(location, 'hit', true, false)
         end
       end
@@ -125,6 +127,8 @@ local function init_script(resource)
       }
       Cooldowns[location].cases[i] = false
     end
+    GlobalState:set(('jewellery:open:%s'):format(location), false, true)
+    GlobalState:set(('jewellery:alarm:%s'):format(location), false, true)
   end
   SetTimeout(2000, function()
     glib.github.check(resource, 'grouse-labs', 'gr_jewellery')
