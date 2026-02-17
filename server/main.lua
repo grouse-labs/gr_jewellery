@@ -13,6 +13,7 @@ local PATROLS_CONFIG <const> = CONFIG.patrols
 local REWARDS <const> = CONFIG.rewards
 local PATROLS <const> = glib.require(RES_NAME..'.server.patrols') --[[@module 'gr_jewellery.server.patrols']]
 local WEATHER_PRESENT <const> = pcall(function() return bridge.weather end)
+local Patrols = {}
 local Cases = {}
 local Stores = {}
 local PresenceCache = {}
@@ -60,8 +61,8 @@ end
 ---@async
 local function main_thread()
   if PATROLS_CONFIG.enable then
-    for _, v in pairs(PATROLS) do
-      exports[PATROLS_CONFIG.name]:createpatrol(v)
+    for k, v in pairs(PATROLS) do
+      Patrols[k] = exports[PATROLS_CONFIG.name]:createpatrol(v)
     end
   end
   while true do
@@ -147,7 +148,13 @@ local function deinit_script(resource)
   Stores = {}
   PresenceCache = {}
   Cooldowns = {}
-  for k in pairs(LOCATIONS) do GlobalState:set(('jewellery:alarm:%s'):format(k), false, true) end
+  for k in pairs(LOCATIONS) do
+    GlobalState:set(('jewellery:alarm:%s'):format(k), false, true)
+    if PATROLS_CONFIG.enable then
+      exports[PATROLS_CONFIG.name]:clearpatrol(Patrols[k], true)
+      Patrols[k] = nil
+    end
+  end
 end
 
 ---@param player string|integer
