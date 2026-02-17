@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Grouse Labs'
 description 'Jewellery Heist for FiveM with Multiple Stores, New Hacks & Auto Door Lock Features'
-version '2.0.0'
+version '2.0.1'
 url 'https://github.com/grouse-labs/gr_jewellery'
 
 shared_scripts {'@gr_lib/init.lua', '@bridge/init.lua'}
