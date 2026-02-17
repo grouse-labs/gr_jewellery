@@ -104,10 +104,7 @@ Rob multiple stores, trigger dynamic alarm systems, disable power with thermite,
 
 ### Preview
 
-- [Don Jewellery](https://youtu.be/t-MO9yvzlx4)
-- [Cases](https://streamable.com/5xcg40)
-- [Dispatch Pt 1](https://streamable.com/3lspsx)
-- [Dispatch Pt 2](https://streamable.com/c9zs9z)
+- [YouTube Preview](https://youtu.be/Gzq6njJgyhY)
 
 ### Installation
 
@@ -152,6 +149,8 @@ Rob multiple stores, trigger dynamic alarm systems, disable power with thermite,
 | [qb-doorlock](https://github.com/qbcore-framework/qb-doorlock)                | 2.0.0   |
 | [Renewed-Weathersync](https://github.com/Renewed-Scripts/Renewed-Weathersync) | 1.1.8   |
 | [qb-weathersync](https://github.com/qbcore-framework/qb-weathersync)          | 2.1.1   |
+
+**Note:** [TheOrderFiveM](https://github.com/TheOrderFivem)'s version of [ox_doorlock](https://github.com/TheOrderFivem/ox_doorlock) has been tested and is also **compatible**, regardless of version warnings.
 
 #### Initial Setup
 
