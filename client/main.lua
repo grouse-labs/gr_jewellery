@@ -243,7 +243,7 @@ local function smash_case(location, case, entity)
         local chance = math.random(100)
         if chance < (not bridge.callback.await('jewellery:server:IsStoreOpen') and 70 or 100) then
           local cams = type(case_data.cams) == 'table' and case_data.cams or {case_data.cams}
-          alert_dispatch('case', cams[#cams > 1 and math.random(#cams) or 1])
+          alert_dispatch('case', cams[#cams > 1 and math.random(#cams) or 1]--[[@as integer]])
         end
       end
     end, location)
