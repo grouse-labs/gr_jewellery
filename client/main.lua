@@ -340,10 +340,8 @@ local function hack_security(location)
     bridge.notify.text(translate('error.fail_hack'), 'error')
   else
     bridge.callback.trigger('jewellery:server:IsStoreVulnerable', false, function()
-      if not leo then
-        bridge.notify.text(translate('success.hacked'), 'success')
-        TriggerServerEvent('jewellery:server:SetStoreState', location, 'hacked', true)
-      end
+      if not leo then bridge.notify.text(translate('success.hacked'), 'success') end
+      TriggerServerEvent('jewellery:server:SetStoreState', location, 'hack', true)
     end, location)
   end
   StopAnimTask(ped, dict, 'base', 8.0)
