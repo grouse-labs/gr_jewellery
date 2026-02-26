@@ -37,7 +37,7 @@ local function set_door_state(location, _type, state, and_sec)
     if and_sec and doors[2] then
       bridge.doorlock.setstate(src, doors[2], not state)
     end
-  elseif _type == 'hacked' then
+  elseif _type == 'hack' then
     for k, v in pairs(LOCATIONS) do
       if v.doors then
         for i = 1, #v.doors do
@@ -72,7 +72,7 @@ local function main_thread()
         _types.locks -= 1
         if _types.locks == 60 then TriggerClientEvent('jewellery:client:StoreClosing', -1, location) end
         if _types.locks == 0 then
-          set_door_state(location, 'hacked', false)
+          set_door_state(location, 'hack', false)
           Stores[location].hit = false
           Stores[location].hacked = false
         end
@@ -227,8 +227,8 @@ local function set_store_state(location, _type, state)
     end)
   elseif _type == 'hack' and state then
     local item = LOCATIONS[location].hack.item
-    if not bridge.core.doesplayerhaveitem(src, item) then return end -- Triggered without item, definitely cheating
     set_alarm_state(location, false)
+    if bridge.core.doesplayerhavegroup(src, GetTypeJobs('leo')) then return end
   end
   Stores[location][_type] = state
   Cooldowns[location].locks = state and LOCK_COOLDOWN
