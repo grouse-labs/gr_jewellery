@@ -28,16 +28,15 @@ local unpack = table.unpack
 ---@param index integer
 ---@param state boolean
 local function set_case_state(location, index, state)
-  if not JEWELLERY_CASES[location][index] then return end
+  if not JEWELLERY_CASES[location] or not JEWELLERY_CASES[location][index] then return end
   local case = JEWELLERY_CASES[location][index]
   local coords = case.coords
   local start_prop = case.start_prop
   local end_prop = case.end_prop
   if not state then
-    if start_prop and end_prop then
-      CreateModelSwap(coords.x, coords.y, coords.z, 0.1, end_prop, start_prop, false)
-      RemoveModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
-    end
+    if not start_prop or not end_prop then return end
+    CreateModelSwap(coords.x, coords.y, coords.z, 0.1, end_prop, start_prop, false)
+    RemoveModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false)
   else
     local ptfx = 'scr_jewelheist'
     if start_prop and end_prop then CreateModelSwap(coords.x, coords.y, coords.z, 0.1, start_prop, end_prop, false) end
@@ -69,7 +68,7 @@ end
 
 ---@param location string
 local function thermite_effect(location)
-  if not LOCATIONS[location].thermite then return end
+  if not LOCATIONS[location] or not LOCATIONS[location].thermite then return end
   local coords = LOCATIONS[location].thermite.coords
   local ptfx = 'scr_ornate_heist'
   local ptfx_handle = 0
@@ -93,7 +92,7 @@ end
 ---@param location string
 ---@param index integer
 local function draw_light(location, index)
-  if not Alarms[location][index] then return end
+  if not Alarms[location] or not Alarms[location][index] then return end
   CreateThread(function()
     local config = LOCATIONS[location].alarms
     if not config then return end
@@ -111,6 +110,7 @@ end
 
 ---@param location string
 local function play_jewel_alarm(location)
+  if not LOCATIONS[location] then return end
   local config = LOCATIONS[location].alarms
   if not config then return end
   local coords = config.coords
@@ -142,10 +142,10 @@ local function deinit_script(resource)
   RemoveAnimDict('amb@world_human_seat_wall_tablet@female@base')
   RemoveNamedPtfxAsset('scr_jewelheist')
   RemoveNamedPtfxAsset('scr_ornate_heist')
-  ReleaseNamedScriptAudioBank('ALARM_BELL_02')
   bridge.target.removemodel(start_case_models)
   for location, config in pairs(LOCATIONS) do
     if Alarms[location] then stop_jewel_alarm(location) end
+    if config.alarms and config.alarms.sound?.bank then ReleaseNamedScriptAudioBank(config.alarms.sound.bank) end
     if config.thermite then bridge.target.removezone('jewellery:thermite:'..location) end
     if config.hack then bridge.target.removezone('jewellery:hack:'..location) end
     if Blips[location] then exports.gr_blips:remove(Blips[location]) end
