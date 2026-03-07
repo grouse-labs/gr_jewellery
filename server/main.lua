@@ -3,9 +3,9 @@ local DEBUG_MODE <const> = bridge._DEBUG
 local JEWELLERY_CASES <const> = glib.require(RES_NAME..'.shared.jewellery_cases') --[[@module 'gr_jewellery.shared.jewellery_cases']]
 local LOCATIONS <const> = glib.require(RES_NAME..'.shared.store_locations') --[[@module 'gr_jewellery.shared.store_locations']]
 local CONFIG <const> = glib.require(RES_NAME..'.server.config') --[[@module 'gr_jewellery.server.config']]
-local LOCK_COOLDOWN <const> = CONFIG.cooldowns.locks * 60
-local CASE_COOLDOWN <const> = CONFIG.cooldowns.cases * 60
-local ALARM_COOLDOWN <const> = CONFIG.cooldowns.alarm * 60
+local LOCK_COOLDOWN <const> = CONFIG.cooldowns.locks * 6
+local CASE_COOLDOWN <const> = CONFIG.cooldowns.cases * 6
+local ALARM_COOLDOWN <const> = CONFIG.cooldowns.alarm * 6
 local OPEN_HOUR <const> = CONFIG.hours.open
 local CLOSE_HOUR <const> = CONFIG.hours.close
 local AUTOLOCK <const> = CONFIG.autolock
@@ -66,7 +66,7 @@ local function main_thread()
     end
   end
   while true do
-    Wait(1000)
+    Wait(10000)
     for location, _types in pairs(Cooldowns) do
       if _types.locks and _types.locks ~= 0 then
         _types.locks -= 1
